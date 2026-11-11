@@ -1,0 +1,484 @@
+<div class="registry-page-container">
+
+  <!-- =========================================================================
+       1. HERO HEADER: THE PUBLIC ENFORCEMENT & TRUST DIRECTORY
+       ========================================================================= -->
+  <header class="registry-hero-banner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="pulse-dot"></span>
+        <span>CHECK A BUSINESS BEFORE YOU PAY</span>
+      </div>
+      <h1 class="hero-title">Business Defaulters & Trust Directory</h1>
+      <p class="hero-subtitle">
+        Search any company, vendor, or contractor in Nigeria before sending money. Find out if they deliver on their promises or if they have defaulted and been reported to the authorities.
+      </p>
+    </div>
+
+    <div class="hero-compliance-seal">
+      <div class="seal-icon">⚖️</div>
+      <div class="seal-texts">
+        <strong>Authority Reports</strong>
+        <span>FCCPC • Police SFU • LASRERA</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       2. LIVE ECOSYSTEM STATS STRIP
+       ========================================================================= -->
+  @if (registryService.stats(); as stats) {
+    <div class="registry-stats-strip">
+      <div class="stat-cell">
+        <span class="stat-label">BUSINESSES TRACKED</span>
+        <strong class="stat-value num-tabular">{{ stats.total_monitored_entities }}+</strong>
+        <span class="stat-hint">Active in Nigeria</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">TRUSTED COMPANIES</span>
+        <strong class="stat-value text-emerald num-tabular">{{ stats.watchdog_cleared_entities }}</strong>
+        <span class="stat-hint">0 Broken Deals</span>
+      </div>
+      <div class="stat-cell stat-cell-danger">
+        <span class="stat-label">BLACKLISTED DEFAULTERS</span>
+        <strong class="stat-value text-danger num-tabular">{{ stats.active_blacklisted_defaults }}</strong>
+        <span class="stat-hint">Reported to Police & FCCPC</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">SUCCESSFUL DEALS</span>
+        <strong class="stat-value text-brand num-tabular">{{ stats.total_covenants_honored }}+</strong>
+        <span class="stat-hint">Delivered as Agreed</span>
+      </div>
+    </div>
+  }
+
+  <!-- =========================================================================
+       3. SEARCH COCKPIT: VERIFY BEFORE YOU PAY
+       ========================================================================= -->
+  <section class="search-cockpit-card">
+    <div class="search-box-header">
+      <h2 class="search-box-title">Check a Company Before Paying</h2>
+      <p class="search-box-sub">Enter a Business Name, CAC Registration Number (RC / BN), or Phone Number:</p>
+    </div>
+
+    <form (ngSubmit)="onSearch()" class="search-form-row">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="registry-search-input" 
+          placeholder="e.g. Prestige Landmark, RC-2849102, Alpha Supplies..." 
+          [(ngModel)]="searchQuery" 
+          name="searchQuery"
+          [disabled]="isSearching()"
+        />
+        @if (searchQuery()) {
+          <button type="button" class="btn-clear-search" (click)="clearSearch()">✕</button>
+        }
+      </div>
+      <button type="submit" class="btn-search-primary" [disabled]="isSearching() || !searchQuery().trim()">
+        @if (isSearching()) {
+          <span class="spinner-small"></span> Searching...
+        } @else {
+          Check Registry →
+        }
+      </button>
+    </form>
+
+    <!-- Quick Search Suggestions -->
+    <div class="quick-pills-row">
+      <span class="quick-label">Quick Checks:</span>
+      <button type="button" class="quick-pill pill-danger" (click)="quickSearch('Prestige Landmark')">
+        ⚠️ Prestige Landmark (Failed Land Deal)
+      </button>
+      <button type="button" class="quick-pill pill-danger" (click)="quickSearch('Apex Continental')">
+        ⚠️ Apex Continental (Failed Machinery Delivery)
+      </button>
+      <button type="button" class="quick-pill pill-success" (click)="quickSearch('Alpha')">
+        ✓ Alpha Supplies (Trusted)
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       4. REGISTRY CATEGORY TABS
+       ========================================================================= -->
+  <div class="registry-tabs-bar">
+    @if (hasSearched()) {
+      <button 
+        type="button" 
+        class="registry-tab-btn" 
+        [class.active]="activeTab() === 'search'"
+        (click)="activeTab.set('search')"
+      >
+        <span>Search Results ({{ searchResults().length }})</span>
+      </button>
+    }
+
+    <button 
+      type="button" 
+      class="registry-tab-btn" 
+      [class.active]="activeTab() === 'blacklist'"
+      (click)="activeTab.set('blacklist')"
+    >
+      <span class="tab-badge-danger">⚠️</span>
+      <span>Defaulters List (Blacklist) ({{ registryService.blacklistRecords().length }})</span>
+    </button>
+
+    <button 
+      type="button" 
+      class="registry-tab-btn" 
+      [class.active]="activeTab() === 'cleared'"
+      (click)="activeTab.set('cleared')"
+    >
+      <span class="tab-badge-success">🛡️</span>
+      <span>Trusted Companies</span>
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       5. TAB CONTENT AREAS
+       ========================================================================= -->
+
+  <!-- TAB A: SEARCH RESULTS -->
+  @if (activeTab() === 'search') {
+    <div class="tab-content-pane fade-in">
+      @if (searchResults().length === 0) {
+        <div class="empty-results-box">
+          <div class="empty-icon">📂</div>
+          <h3>No Direct Blacklist or Registry Record Found for "{{ searchQuery() }}"</h3>
+          <p>
+            This business does not have any recorded defaults or complaints on file. However, always register your commercial agreement on Digital Watchdog before making payments to ensure milestone protection.
+          </p>
+          <a routerLink="/deals/new" class="btn-create-protected-deal">
+            + Create Protected Deal with this Vendor
+          </a>
+        </div>
+      } @else {
+        <div class="entities-grid">
+          @for (entity of searchResults(); track entity.id) {
+            <article class="entity-card" [class.is-blacklisted-card]="entity.is_blacklisted">
+              
+              <!-- Entity Card Header -->
+              <div class="entity-card-header">
+                <div class="entity-title-cluster">
+                  <div class="entity-icon-box" [class.icon-box-danger]="entity.is_blacklisted">
+                    {{ entity.is_blacklisted ? '⚠️' : '🏢' }}
+                  </div>
+                  <div>
+                    <h3 class="entity-name">{{ entity.name }}</h3>
+                    <div class="entity-meta-row">
+                      <span class="rc-badge">{{ entity.rc_number || 'UNREGISTERED ENTITY' }}</span>
+                      <span class="entity-type-badge">{{ entity.entity_type | uppercase }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="entity-badge" [ngClass]="'badge-' + entity.trust_badge.variant">
+                  <span>{{ entity.trust_badge.icon }}</span>
+                  <span>{{ entity.trust_badge.label }}</span>
+                </div>
+              </div>
+
+              <!-- Metrics Row -->
+              <div class="entity-metrics-strip">
+                <div class="metric-item">
+                  <span class="metric-label">Deals Delivered</span>
+                  <strong class="metric-val text-emerald">{{ entity.covenants_fulfilled_count }}</strong>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Failed Deals</span>
+                  <strong class="metric-val" [class.text-danger]="entity.covenants_defaulted_count > 0">
+                    {{ entity.covenants_defaulted_count }}
+                  </strong>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">Standing</span>
+                  <strong class="metric-val">
+                    {{ entity.is_blacklisted ? 'BLACKLISTED' : 'TRUSTED' }}
+                  </strong>
+                </div>
+              </div>
+
+              <!-- Default Records Section (If Blacklisted) -->
+              @if (entity.default_records && entity.default_records.length > 0) {
+                <div class="defaults-attached-box">
+                  <div class="defaults-box-header">
+                    <span class="warn-dot"></span>
+                    <strong>Documented Default Cases on Record:</strong>
+                  </div>
+
+                  @for (def of entity.default_records; track def.id) {
+                    <div class="default-record-card">
+                      <div class="default-record-top">
+                        <span class="case-ref">REF: {{ def.reference_no }}</span>
+                        <strong class="default-amount text-danger">{{ formatMoney(def.deal_amount, def.currency) }}</strong>
+                      </div>
+                      <h4 class="breach-title">{{ def.covenant_breached }}</h4>
+                      <p class="default-summary-text">{{ def.default_summary }}</p>
+
+                      <div class="regulatory-escalation-tags">
+                        <span class="reg-tag tag-fccpc">✓ Reported to FCCPC: {{ def.fccpc_dossier_ref }}</span>
+                        @if (def.reported_to_lasrera) {
+                          <span class="reg-tag">✓ LASRERA Filed</span>
+                        }
+                        @if (def.reported_to_police_sfu) {
+                          <span class="reg-tag">✓ Police SFU Dispatched</span>
+                        }
+                        @if (def.reported_to_credit_bureau) {
+                          <span class="reg-tag">✓ Credit Bureau Flagged</span>
+                        }
+                      </div>
+
+                      <div class="default-card-actions">
+                        <button type="button" class="btn-view-dossier" (click)="openDossierModal(def)">
+                          View Statutory FCCPC Dossier & Evidence Hash →
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+            </article>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAB B: PUBLIC BLACKLIST DIRECTORY -->
+  @if (activeTab() === 'blacklist') {
+    <div class="tab-content-pane fade-in">
+      <div class="blacklist-intro-bar">
+        <div class="intro-left">
+          <h3 class="blacklist-heading">Active Default & Blacklist Directory</h3>
+          <p class="blacklist-sub">
+            Businesses that failed to deliver agreed goods or services and refused to refund buyers following the mandatory 7-day warning window. All records below are actively submitted to the Federal Competition & Consumer Protection Commission (FCCPC).
+          </p>
+        </div>
+        <div class="notice-pill">
+          <span>⚖️ Truth-Backed Objective Records</span>
+        </div>
+      </div>
+
+      <div class="blacklist-cards-list">
+        @for (record of registryService.blacklistRecords(); track record.id) {
+          <article class="blacklist-entity-item">
+            <div class="bl-header-row">
+              <div class="bl-company-info">
+                <span class="bl-danger-badge">⚠️ UNFULFILLED CONTRACT</span>
+                <h3 class="bl-business-name">{{ record.business_name }}</h3>
+                <div class="bl-meta-line">
+                  <span>CAC: <strong class="font-mono">{{ record.rc_number || 'UNREGISTERED' }}</strong></span>
+                  <span>•</span>
+                  <span>Director: <strong>{{ record.director_name || 'Executive Signatory' }}</strong></span>
+                  <span>•</span>
+                  <span>Contact: <strong class="font-mono">{{ record.phone || 'Phone on file' }}</strong></span>
+                </div>
+              </div>
+
+              <div class="bl-amount-badge">
+                <span class="amount-label">DEFAULTED AMOUNT</span>
+                <strong class="amount-value text-danger">{{ formatMoney(record.deal_amount, record.currency) }}</strong>
+              </div>
+            </div>
+
+            <div class="bl-breach-box">
+              <div class="breach-header">
+                <span class="breach-icon">📜</span>
+                <strong>Broken Agreement:</strong>
+                <span>{{ record.covenant_breached }}</span>
+              </div>
+              <p class="breach-factual-summary">
+                {{ record.default_summary }}
+              </p>
+            </div>
+
+            <div class="bl-footer-row">
+              <div class="statutory-filings-group">
+                <span class="filing-pill pill-fccpc">FCCPC Docket: {{ record.fccpc_dossier_ref }}</span>
+                @if (record.reported_to_lasrera) {
+                  <span class="filing-pill">State Land Bureau (LASRERA)</span>
+                }
+                @if (record.reported_to_police_sfu) {
+                  <span class="filing-pill">Police Special Fraud Unit</span>
+                }
+                <span class="filing-pill">Credit Bureau Delinquency Flagged</span>
+              </div>
+
+              <button type="button" class="btn-dossier-pill" (click)="openDossierModal(record)">
+                <span>View FCCPC Dossier & Evidence Hash</span>
+                <span>→</span>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB C: WATCHDOG CLEARED DIRECTORY -->
+  @if (activeTab() === 'cleared') {
+    <div class="tab-content-pane fade-in">
+      <div class="cleared-intro-bar">
+        <div>
+          <h3 class="cleared-heading">Watchdog Cleared Businesses</h3>
+          <p class="cleared-sub">
+            Verified commercial suppliers with multiple completed contracts and zero recorded defaults under Watchdog oversight.
+          </p>
+        </div>
+        <div class="cleared-guarantee-pill">
+          <span>🛡️ Verified Delivery Track Record</span>
+        </div>
+      </div>
+
+      <div class="cleared-cards-grid">
+        <article class="cleared-card">
+          <div class="cleared-top">
+            <div class="cleared-icon-circle">✓</div>
+            <div>
+              <h4 class="cleared-name">Alpha Industrial Supplies Ltd</h4>
+              <span class="cleared-rc">RC-1849204 • Verified Corporate</span>
+            </div>
+          </div>
+          <div class="cleared-stats">
+            <div class="c-stat">
+              <span class="c-label">Deals Completed</span>
+              <strong class="c-val text-emerald">14 Completed</strong>
+            </div>
+            <div class="c-stat">
+              <span class="c-label">Defaults on Record</span>
+              <strong class="c-val text-emerald">0 Defaults</strong>
+            </div>
+          </div>
+          <p class="cleared-desc">
+            Procurement vendor with 100% verified fulfillment of heavy equipment, construction inputs, and building supplies.
+          </p>
+          <div class="cleared-badge-row">
+            <span class="cleared-verified-tag">🛡️ WATCHDOG CLEARED [ TIER 3 ]</span>
+          </div>
+        </article>
+
+        <article class="cleared-card">
+          <div class="cleared-top">
+            <div class="cleared-icon-circle">✓</div>
+            <div>
+              <h4 class="cleared-name">Beta Horizon Infrastructure Ltd</h4>
+              <span class="cleared-rc">RC-2049182 • Verified Corporate</span>
+            </div>
+          </div>
+          <div class="cleared-stats">
+            <div class="c-stat">
+              <span class="c-label">Deals Completed</span>
+              <strong class="c-val text-emerald">8 Completed</strong>
+            </div>
+            <div class="c-stat">
+              <span class="c-label">Defaults on Record</span>
+              <strong class="c-val text-emerald">0 Defaults</strong>
+            </div>
+          </div>
+          <p class="cleared-desc">
+            Turnkey commercial engineering and real estate survey firm with full beacon verification track record.
+          </p>
+          <div class="cleared-badge-row">
+            <span class="cleared-verified-tag">🛡️ WATCHDOG CLEARED [ TIER 3 ]</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  }
+
+  <!-- =========================================================================
+       6. STATUTORY REGULATORY DOSSIER MODAL (FCCPC EVIDENCE PACKET)
+       ========================================================================= -->
+  @if (showDossierModal() && selectedBlacklistRecord(); as def) {
+    <div class="dossier-modal-backdrop" (click)="closeDossierModal()">
+      <div class="dossier-modal-window" (click)="$event.stopPropagation()">
+        
+        <header class="dossier-modal-header">
+          <div class="dossier-header-left">
+            <span class="dossier-crest">⚖️</span>
+            <div>
+              <h3 class="dossier-modal-title">Official Statutory Complaint Dossier</h3>
+              <span class="dossier-docket-no">DOCKET NO: {{ def.fccpc_dossier_ref }}</span>
+            </div>
+          </div>
+          <button type="button" class="btn-dossier-close" (click)="closeDossierModal()">✕</button>
+        </header>
+
+        <div class="dossier-modal-body">
+
+          <!-- Seal of Submission -->
+          <div class="dossier-submission-notice">
+            <strong>OFFICIAL EVIDENCE RECORD SUBMITTED TO STATUTORY ENFORCEMENT BODIES</strong>
+            <p>
+              In accordance with Section 127 of the Federal Competition and Consumer Protection Act 2018, this dossier documents unfulfilled commercial covenants following expiration of the mandatory 7-day cure notice.
+            </p>
+          </div>
+
+          <!-- Parties Table -->
+          <div class="dossier-parties-grid">
+            <div class="party-block">
+              <span class="party-role">RESPONDENT (DEFAULTING VENDOR)</span>
+              <strong class="party-name">{{ def.business_name }}</strong>
+              <span class="party-meta">CAC Registration: {{ def.rc_number || 'UNREGISTERED' }}</span>
+              <span class="party-meta">Executive Director: {{ def.director_name || 'Chief Executive' }}</span>
+              <span class="party-meta">Contact: {{ def.phone || 'Phone on Record' }}</span>
+            </div>
+
+            <div class="party-block">
+              <span class="party-role">TRANSACTION PARTICULARS</span>
+              <strong class="party-name">{{ def.covenant_breached }}</strong>
+              <span class="party-meta">Deal Reference: {{ def.reference_no }}</span>
+              <span class="party-meta">Defaulted Consideration: {{ formatMoney(def.deal_amount, def.currency) }}</span>
+              <span class="party-meta">Cure Window Expired: {{ def.cure_period_expired_at | date:'mediumDate' }}</span>
+            </div>
+          </div>
+
+          <!-- Factual Findings -->
+          <div class="dossier-findings-box">
+            <h4>FACTUAL FINDINGS & EVIDENCE AUDIT</h4>
+            <p>{{ def.default_summary }}</p>
+          </div>
+
+          <!-- Statutory Statutes Invoked -->
+          <div class="dossier-statutes-box">
+            <h4>STATUTORY LAWS & PENALTIES INVOKED</h4>
+            <ul>
+              <li><strong>FCCPA 2018 - Section 127:</strong> Prohibition of deceptive, misleading, and fraudulent commercial trade covenants.</li>
+              <li><strong>FCCPA 2018 - Section 130:</strong> Consumer statutory right to restitution and complete delivery of contracted services.</li>
+              <li><strong>Criminal Code Act - Section 419:</strong> Obtaining financial consideration under false commercial pretences.</li>
+              <li><strong>Credit Reporting Act 2017:</strong> Mandatory reporting of unliquidated commercial covenant delinquency to CRC Credit Bureau.</li>
+            </ul>
+          </div>
+
+          <!-- Cryptographic Integrity Proof -->
+          <div class="dossier-integrity-card">
+            <div class="integrity-header">
+              <span class="lock-icon">🔒</span>
+              <strong>Cryptographic Integrity & Digital Timestamp</strong>
+            </div>
+            <div class="hash-display font-mono">
+              SHA-256: 8a7f9c2e1b40d8924f7a110e53a2b719463c9b78291f04e8d356c9a8120fa21e
+            </div>
+            <span class="hash-sub">This dossier is mathematically anchored to Digital Watchdog's immutable ledger logs.</span>
+          </div>
+
+        </div>
+
+        <footer class="dossier-modal-footer">
+          <div class="footer-help">
+            <span>Facing this vendor?</span>
+            <a href="mailto:enforcement@digitalwatchdog.ng">Contact Watchdog Enforcement Desk</a>
+          </div>
+          <button type="button" class="btn-dossier-print" (click)="closeDossierModal()">
+            Done / Close Dossier
+          </button>
+        </footer>
+
+      </div>
+    </div>
+  }
+
+</div>

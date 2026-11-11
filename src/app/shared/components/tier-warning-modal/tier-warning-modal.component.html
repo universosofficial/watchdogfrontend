@@ -1,0 +1,45 @@
+@if (verificationService.warningModalOpen()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" role="alertdialog" aria-modal="true">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ ctx()?.title || 'Deal Amount Exceeds Current Limit' }}</h3>
+        <button type="button" class="modal-close" (click)="close()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="warning-text">
+          {{ ctx()?.message || 'This deal exceeds your current account limit. Complete identity or payout bank verification to unlock higher deal amounts.' }}
+        </p>
+
+        @if (ctx()?.dealAmount) {
+          <div class="deal-amount-breakdown">
+            <div class="breakdown-row">
+              <span class="breakdown-label">Deal Amount</span>
+              <strong class="font-mono">{{ ctx()!.dealAmount! | number }}</strong>
+            </div>
+            <div class="breakdown-row">
+              <span class="breakdown-label">Current Account Tier</span>
+              <span class="dw-badge dw-badge-warning">
+                {{ ctx()?.currentTier === 'tier_1' ? 'Standard Account (Tier 1)' : 'Verified Account (Tier 2)' }}
+              </span>
+            </div>
+          </div>
+        }
+
+        <div class="clearance-perks-pill">
+          <span class="dw-badge dw-badge-success">QUICK UNLOCK</span>
+          <span>Verification takes less than 2 minutes and unlocks higher transaction limits.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="dw-btn dw-btn-secondary" (click)="close()">
+          Cancel
+        </button>
+        <button type="button" class="dw-btn dw-btn-primary" (click)="upgrade()">
+          Verify Now &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+}

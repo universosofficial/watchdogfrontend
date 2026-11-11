@@ -1,0 +1,251 @@
+<div class="auth-layout" [attr.data-theme]="themeService.currentTheme()">
+
+  <!-- Left Column: Brand & Accountability Showcase -->
+  <aside class="auth-showcase-col" aria-label="Watchdog Overview">
+    <div class="showcase-inner">
+      <a href="http://localhost:4300" class="auth-brand-link" title="Watchdog — Subsidiary of Univasos">
+        <img 
+          src="watchdog-logo.png" 
+          alt="Watchdog — Subsidiary of Univasos" 
+          class="auth-logo-img" 
+        />
+      </a>
+
+      <div class="showcase-body">
+        <span class="showcase-kicker font-mono">WATCHDOG • SUBSIDIARY OF UNIVASOS</span>
+        <h1 class="showcase-title">
+          Make sure both sides keep their word.
+        </h1>
+        <p class="showcase-desc">
+          Write down what was promised, document handover condition with photos, and lock in mutual sign-off on every purchase or sale.
+        </p>
+
+        <div class="showcase-points">
+          <div class="sp-item">
+            <span class="sp-check">✓</span>
+            <span>Clear written terms before money or items move</span>
+          </div>
+          <div class="sp-item">
+            <span class="sp-check">✓</span>
+            <span>Timestamped delivery photos and payment receipts</span>
+          </div>
+          <div class="sp-item">
+            <span class="sp-check">✓</span>
+            <span>Active Watchdog resolution if either side breaks the deal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-foot">
+        <span class="text-xs text-muted">&copy; 2026 Watchdog — Subsidiary of Univasos • Free for P2P deals</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right Column: Sign In Form -->
+  <main class="auth-form-col">
+    <div class="auth-top-bar">
+      <a href="http://localhost:4300" class="auth-mobile-brand" title="Watchdog Home">
+        <img src="watchdog-logo.png" alt="Watchdog — Subsidiary of Univasos" class="auth-mobile-logo" />
+      </a>
+      <a href="http://localhost:4300" class="dw-btn dw-btn-sm dw-btn-ghost auth-back-btn">
+        &larr; Back to Website
+      </a>
+
+      <button
+        type="button"
+        class="dw-btn dw-btn-sm dw-btn-secondary"
+        (click)="toggleTheme()"
+      >
+        <span>{{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}</span>
+      </button>
+    </div>
+
+    <div class="auth-card-wrap">
+      <div class="auth-header">
+        <h2 class="auth-title">Sign in to your account</h2>
+        <p class="auth-subtitle">
+          Enter your registered phone number and password to access your deals.
+        </p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger">
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="auth-form">
+
+        <!-- Phone Number with Country Code -->
+        <div class="dw-form-group">
+          <label class="dw-label" for="login-phone">Phone Number</label>
+          <div class="phone-composite-row">
+            <select
+              class="dw-select country-select-box"
+              [value]="selectedCountry().code"
+              (change)="setCountry(countries[$any($event.target).selectedIndex])"
+              aria-label="Country Dial Code"
+            >
+              @for (c of countries; track c.code) {
+                <option [value]="c.code">{{ c.code }} ({{ c.dialCode }})</option>
+              }
+            </select>
+
+            <input
+              type="tel"
+              id="login-phone"
+              class="dw-input font-mono flex-1"
+              formControlName="phone"
+              placeholder="801 234 5678"
+              autocomplete="tel-national"
+              autofocus
+            />
+          </div>
+          @if (f['phone'].touched && f['phone'].invalid) {
+            <span class="dw-field-error">Please enter a valid mobile phone number.</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="dw-form-group">
+          <div class="dw-label">
+            <label for="login-password">Password</label>
+            <button type="button" class="link-btn" (click)="openForgotModal()" tabindex="-1">
+              Forgot password?
+            </button>
+          </div>
+          <div class="password-input-wrap">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="login-password"
+              class="dw-input pr-toggle"
+              formControlName="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="btn-pw-toggle"
+              (click)="toggleShowPassword()"
+              tabindex="-1"
+            >
+              {{ showPassword() ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          @if (f['password'].touched && f['password'].invalid) {
+            <span class="dw-field-error">Password is required.</span>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="dw-btn dw-btn-primary dw-btn-lg w-100 mt-3"
+          [disabled]="loading()"
+        >
+          @if (loading()) {
+            <span class="spinner"></span>
+            <span>Signing in...</span>
+          } @else {
+            <span>Sign In &rarr;</span>
+          }
+        </button>
+      </form>
+
+      <div class="auth-switch-row">
+        <span class="text-secondary">Don't have an account?</span>
+        <a [routerLink]="['/auth/register']" [queryParams]="returnUrl() ? { returnUrl: returnUrl() } : {}" class="auth-link">
+          Create an account &rarr;
+        </a>
+      </div>
+
+      <div class="auth-legal-links">
+        <a routerLink="/terms" class="text-xs text-muted">Terms of Service</a>
+        <span class="text-xs text-muted">&bull;</span>
+        <a routerLink="/privacy" class="text-xs text-muted">Privacy Policy</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Collapsible Dev Tools Pill (1-Click Test Accounts) -->
+  <div class="dw-dev-pill-wrapper">
+    @if (devToolsOpen()) {
+      <div class="dw-dev-pill-popover">
+        <div class="dev-head-between">
+          <span class="font-mono text-xs font-semibold">TEST ACCOUNTS (DEV)</span>
+          <button type="button" class="btn-close" (click)="toggleDevTools()">✕</button>
+        </div>
+        <button type="button" class="dw-btn dw-btn-sm dw-btn-secondary w-100" (click)="fillDevAccount('buyer'); devToolsOpen.set(false)">
+          Fill Buyer Account (08012345678)
+        </button>
+        <button type="button" class="dw-btn dw-btn-sm dw-btn-secondary w-100" (click)="fillDevAccount('seller'); devToolsOpen.set(false)">
+          Fill Seller Account (08098765432)
+        </button>
+      </div>
+    }
+    <button type="button" class="dw-dev-pill-trigger" (click)="toggleDevTools()">
+      <span>⚙ Demo Accounts</span>
+    </button>
+  </div>
+
+  <!-- Password Recovery Modal -->
+  @if (forgotModalOpen()) {
+    <div class="modal-backdrop" (click)="closeForgotModal()" role="dialog" aria-modal="true">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">Reset Account Password</h3>
+          <button type="button" class="modal-close" (click)="closeForgotModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          @if (forgotError()) {
+            <div class="alert alert-danger">{{ forgotError() }}</div>
+          }
+          @if (forgotSuccess()) {
+            <div class="alert alert-success">{{ forgotSuccess() }}</div>
+          }
+
+          @if (forgotStep() === 'request') {
+            <form [formGroup]="forgotRequestForm" (ngSubmit)="onForgotRequestOtp()">
+              <p class="text-xs text-secondary mb-4">
+                Enter your registered mobile number to receive a 6-digit verification code.
+              </p>
+              <div class="dw-form-group">
+                <label class="dw-label">Phone Number ({{ selectedCountry().dialCode }})</label>
+                <input
+                  type="tel"
+                  class="dw-input font-mono"
+                  formControlName="phone"
+                  placeholder="801 234 5678"
+                />
+              </div>
+              <button type="submit" class="dw-btn dw-btn-primary w-100" [disabled]="forgotLoading()">
+                {{ forgotLoading() ? 'Sending Code...' : 'Send 6-Digit Code' }}
+              </button>
+            </form>
+          }
+
+          @if (forgotStep() === 'reset') {
+            <form [formGroup]="forgotResetForm" (ngSubmit)="onForgotResetPassword()">
+              <p class="text-xs text-secondary mb-4">
+                Enter the 6-digit code sent to <strong>{{ forgotPhone() }}</strong> and choose a new password.
+              </p>
+              <div class="dw-form-group">
+                <label class="dw-label">6-Digit SMS Code</label>
+                <input type="text" class="dw-input font-mono text-center" formControlName="otp" placeholder="123456" maxlength="6" />
+              </div>
+              <div class="dw-form-group">
+                <label class="dw-label">New Password (min 8 characters)</label>
+                <input type="password" class="dw-input" formControlName="new_password" placeholder="Enter new password" />
+              </div>
+              <button type="submit" class="dw-btn dw-btn-primary w-100" [disabled]="forgotLoading()">
+                {{ forgotLoading() ? 'Updating...' : 'Save New Password' }}
+              </button>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

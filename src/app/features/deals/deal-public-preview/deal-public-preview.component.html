@@ -1,0 +1,220 @@
+<div class="public-preview-shell">
+
+  <!-- Top Brand Navigation Bar -->
+  <header class="public-preview-nav">
+    <div class="nav-container">
+      <a routerLink="/" class="brand-link">
+        <img
+          src="watchdog-logo.png"
+          alt="Watchdog — Subsidiary of Univasos"
+          class="nav-logo"
+        />
+      </a>
+      <div class="nav-trust-badge">
+        <span class="trust-shield">🛡️</span>
+        <span class="trust-text">Protected Deal Link</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="preview-main-content">
+
+    @if (loading()) {
+      <div class="preview-deal-card dw-card" aria-label="Loading agreement details">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="dw-skeleton dw-skeleton-text" style="width: 140px;"></span>
+          <span class="dw-skeleton dw-skeleton-badge"></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin: 12px 0;">
+          <span class="dw-skeleton dw-skeleton-title" style="width: 70%; height: 26px;"></span>
+          <span class="dw-skeleton dw-skeleton-text" style="width: 45%;"></span>
+        </div>
+        <div class="dw-skeleton" style="width: 100%; height: 110px; border-radius: var(--radius-sm);"></div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <span class="dw-skeleton" style="width: 120px; height: 120px; border-radius: 8px;"></span>
+          <span class="dw-skeleton" style="width: 120px; height: 120px; border-radius: 8px;"></span>
+          <span class="dw-skeleton" style="width: 120px; height: 120px; border-radius: 8px;"></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+          <span class="dw-skeleton dw-skeleton-btn" style="width: 100%;"></span>
+          <span class="dw-skeleton dw-skeleton-btn" style="width: 100%;"></span>
+        </div>
+      </div>
+    } @else if (error()) {
+      <div class="error-state-card dw-card">
+        <div class="error-icon">⚠️</div>
+        <h1 class="error-title">Agreement Not Accessible</h1>
+        <p class="error-desc">{{ error() }}</p>
+        <div class="error-actions">
+          <a routerLink="/" class="dw-btn dw-btn-primary">Go to Watchdog Home</a>
+        </div>
+      </div>
+    } @else if (previewData(); as data) {
+
+      <div class="preview-deal-card dw-card">
+
+        <!-- Header Ribbon: Reference & Status -->
+        <div class="preview-deal-header">
+          <div class="deal-ref-group">
+            <span class="ref-label">TRANSACTION AGREEMENT</span>
+            <span class="ref-code font-mono">{{ data.deal.reference_no }}</span>
+          </div>
+
+          <div class="deal-status-pill">
+            <span class="status-dot"></span>
+            <span>{{ data.deal.status === 'active' ? 'Active Agreement' : 'Awaiting Review & Signature' }}</span>
+          </div>
+        </div>
+
+        <!-- Deal Hero Title & Price -->
+        <div class="deal-hero-section">
+          <h1 class="deal-hero-title">{{ data.deal.title }}</h1>
+          @if (data.deal.description) {
+            <p class="deal-hero-desc">{{ data.deal.description }}</p>
+          }
+
+          <div class="deal-price-banner">
+            <div class="price-label">Agreed Settlement Price</div>
+            <div class="price-val font-mono">{{ formatPrice(data.deal.amount, data.deal.currency) }}</div>
+            <div class="price-protection-note">
+              🔒 Funds and item condition are protected under Digital Watchdog terms.
+            </div>
+          </div>
+        </div>
+
+        <!-- Verified Initiator / Seller Profile -->
+        <div class="creator-profile-card">
+          <div class="creator-avatar">
+            <span>{{ (data.creator.name || 'P').charAt(0) }}</span>
+          </div>
+          <div class="creator-info">
+            <div class="creator-title-row">
+              <strong class="creator-name">{{ data.creator.name }}</strong>
+              @if (data.creator.is_bank_verified) {
+                <span class="verified-tag">✓ Verified Bank Anchor</span>
+              }
+            </div>
+            <span class="creator-meta">
+              Transaction Initiator &bull; Tier: {{ data.creator.tier?.toUpperCase() || 'TIER 1' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Core USP: Pre-Payment Proof Photos (Locked Baseline) -->
+        @if (data.evidence && data.evidence.length > 0) {
+          <section class="prepayment-photos-section">
+            <div class="section-title-row">
+              <div>
+                <h2 class="sub-heading">📸 Pre-Payment Locked Photos</h2>
+                <p class="sub-sub">
+                  The seller sealed these {{ data.evidence.length }} photo{{ data.evidence.length > 1 ? 's' : '' }} to the evidence ledger. Inspect these closely before agreeing.
+                </p>
+              </div>
+              <span class="ledger-pill">🔒 Ledger Sealed</span>
+            </div>
+
+            <div class="evidence-grid">
+              @for (photo of data.evidence; track photo.id; let idx = $index) {
+                <div class="evidence-photo-box" (click)="openLightbox(photo.url)">
+                  <img [src]="photo.url" [alt]="photo.file_name" class="evidence-img" />
+                  <div class="photo-overlay">
+                    <span class="photo-click-hint">🔍 Tap to Zoom</span>
+                  </div>
+                  <span class="photo-tag">Photo #{{ idx + 1 }}</span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Terms & Covenants -->
+        <section class="terms-section">
+          <h2 class="sub-heading">Agreed Handover & Condition Covenants</h2>
+          <div class="terms-block font-mono">
+            {{ data.current_version?.terms_text || 'Standard Digital Watchdog protected transaction terms apply.' }}
+          </div>
+        </section>
+
+        <!-- 3 Pillars of Protection -->
+        <div class="protection-callout-grid">
+          <div class="callout-item">
+            <span class="callout-icon">🔐</span>
+            <strong>1. Locked Baseline</strong>
+            <p>Seller's photos and promises cannot be secretly altered or deleted after you sign.</p>
+          </div>
+          <div class="callout-item">
+            <span class="callout-icon">📦</span>
+            <strong>2. Physical Check</strong>
+            <p>Inspect the item at handover against these exact photos before releasing settlement.</p>
+          </div>
+          <div class="callout-item">
+            <span class="callout-icon">⚖️</span>
+            <strong>3. Active Case Takeover</strong>
+            <p>If the item is broken, missing, or swapped, Watchdog steps in with the evidence dossier.</p>
+          </div>
+        </div>
+
+        <!-- Primary Action Area -->
+        <div class="preview-actions-footer">
+          <button
+            type="button"
+            class="dw-btn dw-btn-primary dw-btn-lg btn-full-mobile"
+            (click)="onAcceptAndClaim()"
+          >
+            <span>Review & Digitally Accept Agreement &rarr;</span>
+          </button>
+
+          <p class="conversion-legal-note">
+            🔒 By proceeding, both parties are bound by the locked item condition baseline and the Digital Watchdog 7-Day Cure and Handover Guarantee. View <a routerLink="/terms" target="_blank">Terms of Protection</a>.
+          </p>
+
+          <button
+            type="button"
+            class="dw-btn dw-btn-secondary dw-btn-lg btn-full-mobile"
+            (click)="openWhatsAppWithCreator()"
+          >
+            <span>💬 Ask Question on WhatsApp</span>
+          </button>
+
+          <button
+            type="button"
+            class="dw-btn dw-btn-ghost btn-copy"
+            (click)="copyLink()"
+          >
+            <span>🔗 Copy Agreement Link</span>
+          </button>
+        </div>
+
+      </div>
+
+    }
+
+  </main>
+
+  <!-- Photo Lightbox Modal -->
+  @if (lightboxPhotoUrl(); as photoUrl) {
+    <div class="lightbox-backdrop" (click)="closeLightbox()">
+      <div class="lightbox-dialog" (click)="$event.stopPropagation()">
+        <button type="button" class="lightbox-close-btn" (click)="closeLightbox()">&times;</button>
+        <img [src]="photoUrl" alt="Pre-Payment Evidence Zoom" class="lightbox-img" />
+        <div class="lightbox-caption">
+          🔒 Cryptographically Sealed Pre-Payment Baseline Photo
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Minimal Brand Footer -->
+  <footer class="public-preview-footer">
+    <p>&copy; 2026 Digital Watchdog — Subsidiary of Univasos. All rights reserved.</p>
+    <div class="footer-links">
+      <a routerLink="/terms">Terms of Protection</a>
+      <span class="sep">&bull;</span>
+      <a routerLink="/privacy">Privacy Notice</a>
+      <span class="sep">&bull;</span>
+      <a routerLink="/how-it-works">How It Works</a>
+    </div>
+  </footer>
+
+</div>

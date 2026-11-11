@@ -1,0 +1,20 @@
+<div class="toast-stack-container" aria-live="polite" aria-atomic="true">
+  @for (toast of notificationService.messages(); track toast.id) {
+    <div class="toast-card toast-{{ toast.type }}" role="alert">
+      <div class="toast-icon-badge">
+        {{ getIcon(toast.type) }}
+      </div>
+      <div class="toast-body">
+        <p class="toast-message-text">{{ toast.message }}</p>
+      </div>
+      <button 
+        type="button" 
+        class="toast-close-btn" 
+        (click)="dismiss(toast)" 
+        aria-label="Dismiss notification"
+      >
+        ✕
+      </button>
+    </div>
+  }
+</div>

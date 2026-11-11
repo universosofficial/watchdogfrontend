@@ -1,0 +1,422 @@
+<div class="dw-page-shell">
+
+  <!-- 1. Header with Clean Role Switcher -->
+  <header class="create-header">
+    <div class="create-header-left">
+      <a routerLink="/deals" class="back-link">&larr; Back to Deals</a>
+      <h1 class="dw-page-title">Start a Protected Deal</h1>
+      <p class="dw-page-subtitle">
+        Lock what was promised and item photos in writing before payment changes hands.
+      </p>
+    </div>
+
+    <!-- Sleek Segmented Role Pill Toggle (Apple/Linear standard) -->
+    <div class="role-segmented-pill" role="radiogroup" aria-label="Your Role">
+      <button
+        type="button"
+        class="role-segment-btn"
+        [class.active]="initiatorRole() === 'seller'"
+        (click)="setInitiatorRole('seller')"
+      >
+        I am Selling
+      </button>
+      <button
+        type="button"
+        class="role-segment-btn"
+        [class.active]="initiatorRole() === 'buyer'"
+        (click)="setInitiatorRole('buyer')"
+      >
+        I am Buying
+      </button>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- 2. Split Form + Live Certificate Preview -->
+  <div class="create-split-grid">
+
+    <!-- Left Column: Focused Deal Form -->
+    <form [formGroup]="dealForm" (ngSubmit)="onSubmit()" novalidate class="dw-card dw-card-padded create-form-card">
+
+      <!-- STEP 1: The Item & Agreed Price -->
+      <section class="form-step-block">
+        <div class="step-badge-row">
+          <span class="step-num-pill">1</span>
+          <h2 class="step-title">What is being bought or sold?</h2>
+        </div>
+
+        <div class="dw-form-group">
+          <label class="dw-label" for="deal-title">Item or Service Title *</label>
+          <input
+            type="text"
+            id="deal-title"
+            class="dw-input"
+            formControlName="title"
+            placeholder="e.g. iPhone 15 Pro 256GB, Web Design, etc."
+          />
+          @if (f['title'].touched && f['title'].invalid) {
+            <span class="dw-field-error">Please enter a clear title (at least 3 characters).</span>
+          }
+
+          <!-- Quick Preset Suggestion Chips (Minimalist) -->
+          <div class="suggestion-chips-row">
+            <span class="sugg-label">Quick templates:</span>
+            <button type="button" class="sugg-chip" (click)="applyTemplate('procurement')">iPhone / Gadget</button>
+            <button type="button" class="sugg-chip" (click)="applyTemplate('software')">Freelance Work</button>
+            <button type="button" class="sugg-chip" (click)="applyTemplate('construction')">Wholesale Trade</button>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="dw-form-group">
+            <label class="dw-label" for="deal-currency">Currency *</label>
+            <select id="deal-currency" class="dw-select font-mono" formControlName="currency">
+              @for (c of currencies; track c.code) {
+                <option [value]="c.code">{{ c.code }} ({{ c.symbol }}) &mdash; {{ c.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="dw-form-group">
+            <label class="dw-label" for="deal-amount">Agreed Total Price *</label>
+            <input
+              type="number"
+              id="deal-amount"
+              class="dw-input font-mono"
+              formControlName="amount"
+              placeholder="e.g. 85000"
+              min="1"
+              step="any"
+            />
+            @if (f['amount'].touched && f['amount'].invalid) {
+              <span class="dw-field-error">Please enter a valid price greater than 0.</span>
+            }
+          </div>
+        </div>
+
+        <div class="dw-form-group">
+          <label class="dw-label" for="deal-desc">Condition Summary (Optional)</label>
+          <input
+            type="text"
+            id="deal-desc"
+            class="dw-input"
+            formControlName="description"
+            placeholder="e.g. Pristine condition, original packaging included, tested and working"
+          />
+        </div>
+      </section>
+
+      <hr class="form-divider" />
+
+      <!-- STEP 2: Pre-Payment Baseline Photos & Condition Lock (The Core USP) -->
+      <section class="form-step-block">
+        <div class="step-badge-row">
+          <span class="step-num-pill">2</span>
+          <div class="step-title-group">
+            <h2 class="step-title">Item Photos &amp; Condition Proof</h2>
+            <span class="step-tag-pill">Core Protection</span>
+          </div>
+        </div>
+        <p class="step-desc">
+          Lock photos before payment is made. This creates the tamper-proof baseline verified at delivery.
+        </p>
+
+        <!-- Photo Upload Dropzone / Gallery -->
+        <div class="photos-upload-container">
+          @if (itemPhotos().length > 0) {
+            <div class="photo-thumbnails-grid">
+              @for (photo of itemPhotos(); track photo.name; let idx = $index) {
+                <div class="photo-thumb-card">
+                  <img [src]="photo.previewUrl" [alt]="photo.name" class="photo-thumb-img" />
+                  <button
+                    type="button"
+                    class="photo-thumb-remove"
+                    (click)="removePhoto(idx)"
+                    title="Remove photo"
+                    aria-label="Remove photo"
+                  >
+                    &times;
+                  </button>
+                  <span class="photo-thumb-badge">Photo #{{ idx + 1 }}</span>
+                </div>
+              }
+              @if (itemPhotos().length < 8) {
+                <label class="photo-add-card" for="item-photos-input">
+                  <span class="photo-add-icon">+</span>
+                  <span class="photo-add-text">Add More</span>
+                </label>
+              }
+            </div>
+          } @else {
+            <label class="photo-dropzone" for="item-photos-input">
+              <div class="dropzone-icon-box">📸</div>
+              <div class="dropzone-text-group">
+                <strong>Click or tap to upload item photos (Up to 8)</strong>
+                <span>Photos are locked in writing so neither party can alter what was promised.</span>
+              </div>
+              <span class="dw-btn dw-btn-sm dw-btn-secondary">Upload Photos</span>
+            </label>
+          }
+
+          <input
+            type="file"
+            id="item-photos-input"
+            class="sr-only"
+            accept="image/*"
+            multiple
+            (change)="onPhotosSelected($event)"
+          />
+        </div>
+
+        <!-- Progressive Disclosure: Serial Number, IMEI & Flaws (Anti-Swap) -->
+        <div class="progressive-disclosure-wrap">
+          <button
+            type="button"
+            class="progressive-toggle-btn"
+            (click)="toggleDetailedFlaws()"
+          >
+            <span>{{ showDetailedFlawsAndSerial() ? '− Hide Anti-Swap Details' : '+ Add Serial / IMEI & Known Flaws (Anti-Swap Protection)' }}</span>
+          </button>
+
+          @if (showDetailedFlawsAndSerial() || serialNumber() || disclosedFlaws() || selectedAccessories().length > 0) {
+            <div class="progressive-box dw-reveal-scale">
+              <div class="dw-form-group">
+                <label class="dw-label" for="deal-serial">Serial / IMEI / Model Number</label>
+                <input
+                  type="text"
+                  id="deal-serial"
+                  class="dw-input font-mono"
+                  [value]="serialNumber()"
+                  (input)="serialNumber.set($any($event.target).value)"
+                  placeholder="e.g. Serial: F17LK0..., IMEI: 354928110928371, VIN, or Model No."
+                />
+                <span class="dw-field-hint">Locks the exact unit being sent so it cannot be swapped with a broken counterfeit.</span>
+              </div>
+
+              <div class="dw-form-group">
+                <label class="dw-label" for="deal-flaws">Disclose Known Flaws / Scratches Upfront</label>
+                <input
+                  type="text"
+                  id="deal-flaws"
+                  class="dw-input"
+                  [value]="disclosedFlaws()"
+                  (input)="disclosedFlaws.set($any($event.target).value)"
+                  placeholder="e.g. Minor hairline scratch on bezel; 92% battery; functions perfectly"
+                />
+                <span class="dw-field-hint">Disclosing flaws upfront protects sellers against false buyer returns.</span>
+              </div>
+
+              <div class="dw-form-group">
+                <label class="dw-label">Included Accessories</label>
+                <div class="accessory-chips-grid">
+                  @for (acc of availableAccessories; track acc) {
+                    <button
+                      type="button"
+                      class="accessory-chip"
+                      [class.selected]="selectedAccessories().includes(acc)"
+                      (click)="toggleAccessory(acc)"
+                    >
+                      <span class="chip-check">{{ selectedAccessories().includes(acc) ? '✓' : '+' }}</span>
+                      <span>{{ acc }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <hr class="form-divider" />
+
+      <!-- STEP 3: The Counterparty & Smart Handover Rules -->
+      <section class="form-step-block">
+        <div class="step-badge-row">
+          <span class="step-num-pill">3</span>
+          <h2 class="step-title">Who are you trading with?</h2>
+        </div>
+
+        <div class="form-row-2">
+          <div class="dw-form-group">
+            <label class="dw-label" for="partner-phone">
+              <span>{{ initiatorRole() === 'seller' ? "Buyer's" : "Seller's" }} Phone or WhatsApp *</span>
+            </label>
+            <input
+              type="tel"
+              id="partner-phone"
+              class="dw-input font-mono"
+              formControlName="counterparty_phone"
+              placeholder="e.g. +1 555 234 5678 or 08012345678"
+            />
+            @if (f['counterparty_phone'].touched && f['counterparty_phone'].invalid) {
+              <span class="dw-field-error">Please enter a valid phone number.</span>
+            }
+          </div>
+
+          <div class="dw-form-group">
+            <label class="dw-label" for="deal-date">Expected Handover Date (Optional)</label>
+            <input
+              type="date"
+              id="deal-date"
+              class="dw-input font-mono"
+              formControlName="expected_end_date"
+            />
+          </div>
+        </div>
+
+        <!-- Intelligent Protection Defaults Card -->
+        <div class="smart-protection-card">
+          <div class="sp-left">
+            <span class="sp-shield">🛡️</span>
+            <div>
+              <strong>Standard Protection Active</strong>
+              <span>48h buyer inspection &bull; Direct payment (0% frozen) &bull; 7-day cure guarantee</span>
+            </div>
+          </div>
+          <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="toggleAdvanced()">
+            {{ showAdvancedOptions() ? 'Hide Options' : 'Customize' }}
+          </button>
+        </div>
+
+        @if (showAdvancedOptions()) {
+          <div class="advanced-options-box dw-reveal-scale">
+            <div class="adv-row">
+              <span class="adv-label">Inspection Window:</span>
+              <div class="adv-pills">
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedInspectionWindow() === '24h' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setInspectionWindow('24h')">24h</button>
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedInspectionWindow() === '48h' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setInspectionWindow('48h')">48h (Standard)</button>
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedInspectionWindow() === '7d' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setInspectionWindow('7d')">7 Days</button>
+              </div>
+            </div>
+
+            <div class="adv-row">
+              <span class="adv-label">Payment Structure:</span>
+              <div class="adv-pills">
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedTranche() === 'single' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setTranche('single')">100% Full Payment</button>
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedTranche() === 'two_stage' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setTranche('two_stage')">50% / 50% Split</button>
+              </div>
+            </div>
+
+            <div class="dw-form-group mt-2">
+              <label class="dw-label" for="deal-terms">Legal Contract Language</label>
+              <textarea
+                id="deal-terms"
+                class="dw-textarea font-mono text-xs"
+                rows="4"
+                formControlName="terms_text"
+              ></textarea>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- Submit Footer -->
+      <div class="create-form-footer">
+        <a routerLink="/deals" class="dw-btn dw-btn-secondary">Cancel</a>
+        <button type="submit" class="dw-btn dw-btn-primary dw-btn-lg" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+            <span>{{ statusFeedback() }}</span>
+          } @else {
+            <span>Create Protected Deal & Get Signing Link &rarr;</span>
+          }
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Right Column: Live Agreement Preview Card -->
+    <aside class="create-preview-col">
+      <div class="dw-card dw-card-padded preview-sticky-card">
+        <div class="preview-top-row">
+          <span class="font-mono text-xs text-muted">PROTECTION CERTIFICATE</span>
+          <span class="dw-badge dw-badge-active">
+            <span class="dw-badge-dot"></span>
+            <span>Ready to Lock</span>
+          </span>
+        </div>
+
+        <h3 class="preview-deal-title">
+          {{ f['title'].value || 'Untitled Agreement' }}
+        </h3>
+        <p class="preview-deal-desc">
+          {{ f['description'].value || 'Baseline photos and condition rules will be locked here.' }}
+        </p>
+
+        <div class="preview-price-box">
+          <span class="preview-price-lbl">Agreed Price</span>
+          <strong class="preview-price-val font-mono">
+            {{ f['currency'].value || 'USD' }} {{ (f['amount'].value || 0) | number:'1.0-2' }}
+          </strong>
+        </div>
+
+        @if (itemPhotos().length > 0 || serialNumber() || disclosedFlaws() || selectedAccessories().length > 0) {
+          <div class="preview-locked-specs-box">
+            <div class="pls-badge">
+              <span>🔒 LOCKED PRE-PAYMENT BASELINE</span>
+            </div>
+
+            @if (itemPhotos().length > 0) {
+              <div class="pls-photos-strip">
+                @for (photo of itemPhotos(); track photo.name) {
+                  <img [src]="photo.previewUrl" [alt]="photo.name" class="pls-photo-thumb" />
+                }
+              </div>
+              <span class="pls-photo-count">{{ itemPhotos().length }} photo{{ itemPhotos().length > 1 ? 's' : '' }} ready</span>
+            }
+
+            @if (serialNumber()) {
+              <div class="pls-row">
+                <span class="pls-lbl">Serial / IMEI:</span>
+                <span class="pls-val font-mono">{{ serialNumber() }}</span>
+              </div>
+            }
+
+            @if (disclosedFlaws()) {
+              <div class="pls-row">
+                <span class="pls-lbl">Disclosed Flaws:</span>
+                <span class="pls-val">{{ disclosedFlaws() }}</span>
+              </div>
+            }
+
+            @if (selectedAccessories().length > 0) {
+              <div class="pls-row">
+                <span class="pls-lbl">Accessories:</span>
+                <span class="pls-val">{{ selectedAccessories().join(', ') }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="preview-meta-list">
+          <div class="pm-row">
+            <span>Your Role</span>
+            <strong>{{ initiatorRole() === 'buyer' ? 'Buyer' : 'Seller' }}</strong>
+          </div>
+          <div class="pm-row">
+            <span>Counterparty</span>
+            <strong class="font-mono">{{ f['counterparty_phone'].value || 'Pending phone number' }}</strong>
+          </div>
+          <div class="pm-row">
+            <span>Inspection</span>
+            <strong>{{ selectedInspectionWindow() }} window</strong>
+          </div>
+        </div>
+
+        <div class="preview-guarantee-note">
+          <strong>Watchdog Guarantee</strong>
+          <p>
+            Once both sides sign, terms and photos are immutably locked. If either party breaks their word, Watchdog takes up your case with your proof.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+</div>

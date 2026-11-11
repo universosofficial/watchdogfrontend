@@ -1,0 +1,141 @@
+:host {
+  display: inline-block;
+}
+
+.tactile-hold-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 20px 10px 14px;
+  border-radius: 12px;
+  background: #059669;
+  color: #ffffff;
+  border: 1px solid #10B981;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+/* Touch Padding for Mobile Viewports */
+@media (max-width: 768px) {
+  .tactile-hold-btn {
+    min-height: 54px;
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}
+
+.tactile-hold-btn:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+}
+
+.tactile-hold-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Holding Kinetic State */
+.tactile-hold-btn.holding {
+  background: #065F46;
+  border-color: #34D399;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.45);
+}
+
+.tactile-hold-btn.completed {
+  background: #047857;
+  border-color: #10B981;
+  cursor: default;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+}
+
+.tactile-hold-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Circular Progress Ring */
+.hold-progress-svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.progress-track {
+  stroke: rgba(255, 255, 255, 0.25);
+}
+
+.progress-fill {
+  stroke: #34D399;
+  stroke-dasharray: 113.1;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.05s linear;
+}
+
+/* Label & Layout */
+.hold-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hold-icon {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.hold-icon.pulse {
+  animation: pulse-ring 0.6s infinite alternate;
+}
+
+.check-icon {
+  font-size: 18px;
+  color: #A7F3D0;
+}
+
+.hold-text-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+}
+
+.hold-label {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.hold-sublabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #D1FAE5;
+  letter-spacing: 0.02em;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.25); opacity: 1; }
+}
+
+/* Dual-Theme Dark/Light Adjustments */
+[data-theme="dark"] .tactile-hold-btn {
+  background: #065F46;
+  border-color: #059669;
+}
+
+[data-theme="dark"] .tactile-hold-btn.holding {
+  background: #047857;
+  box-shadow: 0 0 25px rgba(52, 211, 153, 0.5);
+}

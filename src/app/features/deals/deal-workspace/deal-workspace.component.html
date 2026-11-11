@@ -1,0 +1,786 @@
+<div class="dw-page-shell" [attr.data-theme]="themeService.currentTheme()">
+
+  <!-- 1. LOADING STATE: Premium Shimmer Skeleton (Mistake #6) -->
+  @if (loading()) {
+    <div class="workspace-skeleton-shell">
+      <div class="dw-card" style="padding: 20px 24px; margin-bottom: 16px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <span class="dw-skeleton dw-skeleton-text" style="width: 80px;"></span>
+          <span class="dw-skeleton dw-skeleton-badge"></span>
+        </div>
+        <span class="dw-skeleton dw-skeleton-title" style="width: 45%; height: 26px;"></span>
+      </div>
+
+      <div class="dw-card" style="padding: 16px; margin-bottom: 16px; display: flex; gap: 24px;">
+        <span class="dw-skeleton" style="flex: 1; height: 38px; border-radius: 6px;"></span>
+        <span class="dw-skeleton" style="flex: 1; height: 38px; border-radius: 6px;"></span>
+        <span class="dw-skeleton" style="flex: 1; height: 38px; border-radius: 6px;"></span>
+        <span class="dw-skeleton" style="flex: 1; height: 38px; border-radius: 6px;"></span>
+      </div>
+
+      <div class="deal-workspace-grid">
+        <div class="dw-card" style="padding: 24px; min-height: 380px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span class="dw-skeleton dw-skeleton-avatar"></span>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+              <span class="dw-skeleton dw-skeleton-title" style="width: 140px;"></span>
+              <span class="dw-skeleton dw-skeleton-text" style="width: 220px;"></span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span class="dw-skeleton dw-skeleton-avatar"></span>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+              <span class="dw-skeleton dw-skeleton-title" style="width: 180px;"></span>
+              <span class="dw-skeleton dw-skeleton-text" style="width: 280px;"></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="dw-card" style="padding: 20px;">
+            <span class="dw-skeleton dw-skeleton-text" style="width: 90px; margin-bottom: 8px;"></span>
+            <span class="dw-skeleton dw-skeleton-title" style="width: 140px; height: 28px;"></span>
+          </div>
+          <div class="dw-card" style="padding: 20px;">
+            <span class="dw-skeleton dw-skeleton-text" style="width: 100px; margin-bottom: 8px;"></span>
+            <span class="dw-skeleton dw-skeleton-text" style="width: 100%;"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else if (error()) {
+    <!-- 2. ERROR STATE -->
+    <div class="workspace-state-card dw-card">
+      <h2 class="dw-page-title">Deal Not Found</h2>
+      <p class="dw-page-subtitle">{{ error() }}</p>
+      <button type="button" class="dw-btn dw-btn-secondary mt-3" (click)="backToDeals()">
+        &larr; Back to Deals
+      </button>
+    </div>
+  } @else if (activeDealDetails(); as details) {
+
+    <!-- 3. DEAL ROOM HEADER -->
+    <header class="deal-room-header dw-card">
+      <div class="header-left-group">
+        <div class="crumb-row">
+          <button type="button" class="back-link-btn" (click)="backToDeals()">
+            &larr; Deals
+          </button>
+          <span class="crumb-sep">/</span>
+          <span class="font-mono text-xs text-muted">{{ details.deal.reference_no }}</span>
+          <dw-status-badge [status]="details.deal.status"></dw-status-badge>
+        </div>
+
+        <h1 class="deal-title-heading">{{ cleanTitle(details.deal.title) }}</h1>
+      </div>
+
+      <!-- Next Best Action Bar -->
+      <div class="header-right-actions">
+        @if (details.deal.status === 'active') {
+          @if (getDealRole(details.deal) === 'supplying') {
+            <button type="button" class="dw-btn dw-btn-primary" (click)="showWaybillDrawer.set(true)">
+              <span>Upload Delivery Proof</span>
+            </button>
+          }
+          @if (getDealRole(details.deal) === 'buying') {
+            <button type="button" class="dw-btn dw-btn-primary" (click)="openPaymentDrawer()">
+              <span>Record Payment</span>
+            </button>
+          }
+          <button type="button" class="dw-btn dw-btn-secondary" (click)="openDiscrepancyModal()">
+            <span>Report Issue</span>
+          </button>
+        }
+
+        <button type="button" class="dw-btn dw-btn-secondary" (click)="showTermsModal.set(true)">
+          <span>View Terms</span>
+        </button>
+
+        <button
+          type="button"
+          class="dw-btn dw-btn-secondary"
+          (click)="copyInviteLink(details.deal.id)"
+        >
+          <span>{{ copiedInviteLink() ? 'Copied!' : 'Copy Link' }}</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 4. 4-STEP LIFECYCLE PROGRESS BAR -->
+    <section class="lifecycle-bar dw-card" aria-label="Deal Progress">
+      <div class="lifecycle-step" [class.done]="details.deal.status !== 'draft' && details.deal.status !== 'awaiting_acceptance'" [class.current]="details.deal.status === 'draft' || details.deal.status === 'awaiting_acceptance'">
+        <span class="step-idx">1</span>
+        <div class="step-meta">
+          <strong>Agree & Sign</strong>
+          <span>Both parties lock terms</span>
+        </div>
+      </div>
+
+      <div class="lifecycle-step" [class.done]="reconciliation().confirmedValue > 0" [class.current]="details.deal.status === 'active' && reconciliation().confirmedValue === 0">
+        <span class="step-idx">2</span>
+        <div class="step-meta">
+          <strong>Payment Recorded</strong>
+          <span>Transfer receipt logged</span>
+        </div>
+      </div>
+
+      <div class="lifecycle-step" [class.done]="(details.deliveries?.length || 0) > 0" [class.current]="details.deal.status === 'active' && (details.deliveries?.length || 0) === 0">
+        <span class="step-idx">3</span>
+        <div class="step-meta">
+          <strong>Handover & Photos</strong>
+          <span>Condition verified</span>
+        </div>
+      </div>
+
+      <div class="lifecycle-step" [class.done]="details.deal.status === 'completed'">
+        <span class="step-idx">4</span>
+        <div class="step-meta">
+          <strong>Completed</strong>
+          <span>Both sides signed off</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Unverified Party Notice -->
+    @if (details.participants.has_unverified_party) {
+      <div class="alert alert-warning">
+        <div class="flex-1">
+          <strong>Verification Recommended:</strong> One party has not yet completed bank or face verification. Completing verification increases trust and unlocks higher transaction limits.
+        </div>
+        <a routerLink="/verification" class="dw-btn dw-btn-sm dw-btn-secondary">Verify Now &rarr;</a>
+      </div>
+    }
+
+    <!-- 4.5 WATCHDOG CASE TAKEOVER & DISPUTE RESOLUTION CONSOLE (The Recovery Principle) -->
+    @if (details.deal.status === 'disputed') {
+      <section class="dispute-console-card dw-card" aria-label="Watchdog Case Takeover">
+        <div class="dispute-console-header">
+          <div class="dch-left">
+            <div class="dch-badge-row">
+              <span class="dw-badge dw-badge-danger">
+                <span class="dw-badge-dot"></span>
+                <span>🛡️ Watchdog Case Takeover Active</span>
+              </span>
+              <span class="cure-countdown-badge">
+                ⏳ 7-Day Cure Window: Active
+              </span>
+            </div>
+            <h2 class="dispute-console-heading">Transaction Paused for Issue Resolution</h2>
+            <p class="dispute-console-sub">
+              An issue was reported on the evidence ledger. Trade funds and handover sign-offs are paused while both parties work to resolve the matter or submit clarifying evidence.
+            </p>
+          </div>
+
+          <div class="dch-actions">
+            <button type="button" class="dw-btn dw-btn-primary" (click)="resolveActiveDispute(details.deal.id)">
+              <span>✓ Resolve & Unfreeze Deal</span>
+            </button>
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="downloadAuditDossier(details.deal.id)">
+              <span>📄 Download Sealed Dossier</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3-Phase Progression Bar -->
+        <div class="dispute-phases-grid">
+          <div class="dp-step done">
+            <span class="dp-idx">1</span>
+            <div>
+              <strong>Breach Flagged</strong>
+              <span>Evidence logged on ledger</span>
+            </div>
+          </div>
+          <div class="dp-step current">
+            <span class="dp-idx">2</span>
+            <div>
+              <strong>7-Day Cure Period</strong>
+              <span>Replace, repair, or refund</span>
+            </div>
+          </div>
+          <div class="dp-step">
+            <span class="dp-idx">3</span>
+            <div>
+              <strong>Regulatory Escalation</strong>
+              <span>Dossier sent to Bank & Authority</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- 5. SIGNING / INVITE CALLOUT BANNER (When Deal is Awaiting Signature) -->
+    @if (details.deal.status === 'draft' || details.deal.status === 'awaiting_acceptance') {
+      @if (!isCurrentUserCreator()) {
+        <section class="action-banner-card dw-card" aria-label="Review and Sign Agreement">
+          <div class="banner-top">
+            <div>
+              <span class="font-mono text-xs text-sky">ACTION REQUIRED</span>
+              <h2 class="banner-heading">Review & Sign Agreement with {{ details.participants.creator.name }}</h2>
+              <p class="banner-sub">
+                Review the agreed terms below for <strong>{{ formatMoney(details.deal.amount, details.deal.currency) }}</strong>. Once you sign, the terms are locked and protected.
+              </p>
+            </div>
+          </div>
+
+          <div class="terms-box font-mono">
+            {{ details.current_version.terms_text || 'Standard buyer and seller protection rules apply.' }}
+          </div>
+
+          @if (!hasCurrentUserAccepted()) {
+            <div class="banner-actions">
+              <button type="button" class="dw-btn dw-btn-primary dw-btn-lg" (click)="onSlideAcceptDeal(details.deal.id)">
+                <span>Accept & Sign Agreement</span>
+              </button>
+              <button type="button" class="dw-btn dw-btn-secondary" (click)="openTermsEdit()">
+                <span>Suggest Changes</span>
+              </button>
+            </div>
+          } @else {
+            <div class="signed-confirmation-row">
+              <span class="dw-badge dw-badge-success">✓ Signed by You</span>
+              <span class="text-xs text-secondary">Waiting for {{ getPartnerName() }} to sign.</span>
+              @if (!isProduction) {
+                <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="onSimulateAccept(details.deal.id)">
+                  Simulate Partner Signature (Test Mode)
+                </button>
+              }
+            </div>
+          }
+        </section>
+      } @else {
+        <section class="action-banner-card dw-card" aria-label="Share Signing Link">
+          <div class="banner-top">
+            <div>
+              <span class="font-mono text-xs text-muted">WAITING FOR PARTNER SIGNATURE</span>
+              <h2 class="banner-heading">Share Signing Link with {{ details.deal.counterparty_business_name || 'Your Partner' }}</h2>
+              <p class="banner-sub">
+                Send the direct link below so the other person can review the terms and sign to activate the deal.
+              </p>
+            </div>
+          </div>
+
+          <div class="banner-actions">
+            <button type="button" class="dw-btn dw-btn-primary" (click)="copyInviteLink(details.deal.id)">
+              <span>{{ copiedInviteLink() ? 'Copied Signing Link!' : 'Copy Signing Link' }}</span>
+            </button>
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="sendWhatsAppInvite(details.deal)">
+              <span>Share via WhatsApp</span>
+            </button>
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="sendTelegramInvite(details.deal)">
+              <span>Share via Telegram</span>
+            </button>
+            @if (!isProduction) {
+              <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="onSimulateAccept(details.deal.id)">
+                Simulate Partner Sign-Off (Test Mode)
+              </button>
+            }
+          </div>
+        </section>
+      }
+    }
+
+    <!-- 5.5 PRE-PAYMENT LOCKED BASELINE PHOTOS (Core USP) -->
+    @if (details.evidence && details.evidence.length > 0) {
+      <section class="locked-baseline-card dw-card" aria-label="Pre-Payment Proof Ledger">
+        <div class="baseline-header-row">
+          <div class="baseline-title-group">
+            <div class="baseline-tag-row">
+              <span class="dw-badge dw-badge-active">
+                <span class="dw-badge-dot"></span>
+                <span>🔒 Sealed Baseline</span>
+              </span>
+              <span class="font-mono text-xs text-sky">{{ details.evidence.length }} Photo{{ details.evidence.length > 1 ? 's' : '' }} Locked</span>
+            </div>
+            <h2 class="baseline-heading">Pre-Payment Item Photos & Condition Baseline</h2>
+            <p class="baseline-sub">
+              These photos were sealed to the tamper-proof evidence ledger before payment. Both parties must use these to verify condition at delivery handover.
+            </p>
+          </div>
+        </div>
+
+        <div class="baseline-thumbnails-strip">
+          @for (photo of details.evidence; track photo.id; let idx = $index) {
+            <div
+              class="baseline-photo-box"
+              (click)="openLightbox(photo.preview_url || ('/api/v1/deals/' + details.deal.id + '/evidence/' + photo.id + '/download'))"
+              title="Click to view full-resolution photo"
+            >
+              <img
+                [src]="photo.preview_url || ('/api/v1/deals/' + details.deal.id + '/evidence/' + photo.id + '/download')"
+                [alt]="photo.file_name"
+                class="baseline-img"
+              />
+              <span class="baseline-tag">#{{ idx + 1 }}</span>
+              <span class="zoom-hover-hint">🔍 Zoom</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 6. MAIN 2-COLUMN DEAL WORKSPACE -->
+    <div class="deal-workspace-grid">
+
+      <!-- Left / Main Column: Timeline & Messages -->
+      <main class="timeline-column dw-card">
+        <div class="dw-card-header">
+          <div>
+            <h2 class="dw-card-title">Deal Timeline & Evidence Log</h2>
+            <p class="dw-card-subtitle">Every signature, payment receipt, delivery photo, and message is recorded in order.</p>
+          </div>
+        </div>
+
+        <div class="timeline-feed-list">
+          @for (item of feedItems(); track item.id) {
+            <div class="timeline-event-row" [class.is-self]="item.isCurrentUserActor">
+              <div class="event-avatar-box">
+                {{ item.actorName.substring(0, 2).toUpperCase() }}
+              </div>
+
+              <div class="event-content-col">
+                <div class="event-meta-header">
+                  <strong class="event-actor-name">{{ item.actorName }}</strong>
+                  <span class="dw-badge dw-badge-neutral">{{ item.type | uppercase }}</span>
+                  <span class="font-mono text-xs text-muted">{{ formatDate(item.timestamp) }} {{ formatTime(item.timestamp) }}</span>
+                </div>
+
+                <!-- Event Type: Agreement Created -->
+                @if (item.type === 'invitation') {
+                  <div class="event-body-card">
+                    <p>Created agreement for <strong>{{ item.dealTitle }}</strong>.</p>
+                    <div class="terms-snippet-box font-mono">
+                      {{ item.termsText }}
+                    </div>
+                  </div>
+                }
+
+                <!-- Event Type: Delivery / Handover Proof -->
+                @if (item.type === 'delivery' && item.delivery) {
+                  <div class="event-body-card">
+                    <p>
+                      Uploaded delivery proof via <strong>{{ item.delivery.carrier }}</strong>
+                      (Ref: <code class="font-mono">{{ item.delivery.tracking_ref }}</code>).
+                    </p>
+                    @if (item.delivery.waybillPhotoUrl) {
+                      <div class="evidence-thumb" (click)="openLightbox(item.delivery.waybillPhotoUrl)">
+                        <img [src]="item.delivery.waybillPhotoUrl" alt="Delivery Evidence Photo" />
+                        <span class="thumb-caption">View Photo Proof</span>
+                      </div>
+                    }
+                    @if (item.needsBuyerAcknowledgement) {
+                      <div class="event-inline-action">
+                        <button type="button" class="dw-btn dw-btn-sm dw-btn-primary" (click)="acknowledgeDelivery(details.deal.id, item.delivery.id)">
+                          ✓ Confirm Item Received in Agreed Condition
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Event Type: Payment Recorded -->
+                @if (item.type === 'payment' && item.payment) {
+                  <div class="event-body-card">
+                    <p>
+                      Logged payment transfer of
+                      <strong class="font-mono text-emerald">{{ formatMoney(item.payment.reported_amount || 0, details.deal.currency) }}</strong>
+                      (Ref: <code class="font-mono">{{ item.payment.reference_no }}</code>).
+                    </p>
+                    @if (item.payment.receiptUrl) {
+                      <div class="evidence-thumb" (click)="openLightbox(item.payment.receiptUrl)">
+                        <img [src]="item.payment.receiptUrl" alt="Payment Receipt" />
+                        <span class="thumb-caption">View Payment Receipt</span>
+                      </div>
+                    }
+                    @if (item.needsRecipientConfirmation) {
+                      <div class="event-inline-action">
+                        <button type="button" class="dw-btn dw-btn-sm dw-btn-primary" (click)="onConfirmPayment(details.deal.id, item.payment.id)">
+                          ✓ Confirm Payment Received
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Event Type: Dispute / Issue Reported -->
+                @if (item.type === 'dispute' && item.dispute) {
+                  <div class="event-body-card dispute-box">
+                    <p><strong>Issue Reported:</strong> "{{ item.dispute.description }}"</p>
+                    <span class="dw-badge dw-badge-danger">Watchdog Resolution Active</span>
+                  </div>
+                }
+
+                <!-- Event Type: Message / Note -->
+                @if (item.type === 'terms' && item.termsText) {
+                  <div class="event-body-card">
+                    <p>{{ item.termsText }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Message Input Footer -->
+        <div class="timeline-message-bar">
+          <input
+            type="text"
+            class="dw-input"
+            placeholder="Write a note or update for your trading partner..."
+            [ngModel]="chatInputText()"
+            (ngModelChange)="chatInputText.set($event)"
+            (keydown.enter)="sendChatMessage()"
+          />
+          <button type="button" class="dw-btn dw-btn-primary" (click)="sendChatMessage()">
+            Send
+          </button>
+        </div>
+      </main>
+
+      <!-- Right Sidebar: Financial Summary & Participants -->
+      <aside class="summary-sidebar-col">
+
+        <!-- Card 1: Agreed Value & Balance -->
+        <div class="dw-card dw-card-padded side-summary-card">
+          <span class="side-eyebrow">AGREED PRICE</span>
+          <strong class="side-big-amount font-mono">
+            {{ formatMoney(reconciliation().agreedValue, reconciliation().currency) }}
+          </strong>
+
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [style.width.%]="reconciliation().agreedValue > 0 ? (reconciliation().confirmedValue / reconciliation().agreedValue * 100) : 0"
+            ></div>
+          </div>
+
+          <div class="reconcile-rows">
+            <div class="rec-row">
+              <span>Confirmed Paid</span>
+              <strong class="font-mono text-emerald">{{ formatMoney(reconciliation().confirmedValue, reconciliation().currency) }}</strong>
+            </div>
+            <div class="rec-row">
+              <span>Remaining Balance</span>
+              <strong class="font-mono">{{ formatMoney(reconciliation().outstandingValue, reconciliation().currency) }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Participants -->
+        <div class="dw-card dw-card-padded side-summary-card">
+          <span class="side-eyebrow">PARTICIPANTS</span>
+
+          <div class="participant-list">
+            <div class="participant-row">
+              <div class="part-avatar">
+                {{ details.participants.creator.name.substring(0, 2).toUpperCase() }}
+              </div>
+              <div class="part-info">
+                <strong>{{ details.participants.creator.name }}</strong>
+                <span>{{ details.deal.creator_business_id === authService.activeBusiness()?.id ? 'Initiator (You)' : 'Initiator' }} • Signed ✓</span>
+              </div>
+            </div>
+
+            <div class="participant-row">
+              <div class="part-avatar">
+                {{ (details.participants.counterparty?.name || 'P').substring(0, 2).toUpperCase() }}
+              </div>
+              <div class="part-info">
+                <strong>{{ details.participants.counterparty?.name || details.deal.counterparty_business_name || 'Invited Partner' }}</strong>
+                <span>
+                  {{ details.acceptances_status.counterparty_accepted ? 'Signed & Accepted ✓' : 'Waiting for Signature' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Payment Reference & Protection -->
+        <div class="dw-card dw-card-padded side-summary-card">
+          <div class="side-row-between">
+            <span class="side-eyebrow">SETTLEMENT DETAILS</span>
+            <span class="dw-badge dw-badge-success">Direct Transfer</span>
+          </div>
+
+          <div class="reconcile-rows">
+            <div class="rec-row">
+              <span>Recipient</span>
+              <strong>{{ details.participants.creator.name }}</strong>
+            </div>
+            <div class="rec-row">
+              <span>Deal Reference</span>
+              <strong class="font-mono">{{ details.deal.reference_no }}</strong>
+            </div>
+          </div>
+
+          <p class="side-note">
+            Always include reference <code class="font-mono">{{ details.deal.reference_no }}</code> in your transfer note and upload the payment receipt so both sides have permanent proof.
+          </p>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- =========================================================================
+         7. MODALS & DRAWERS (Standardized Dialog Primitives)
+         ========================================================================= -->
+
+    <!-- DELIVERY PROOF MODAL -->
+    @if (showWaybillDrawer()) {
+      <div class="modal-backdrop" (click)="showWaybillDrawer.set(false)" role="dialog" aria-modal="true">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">Upload Delivery & Handover Proof</h3>
+            <button type="button" class="modal-close" (click)="showWaybillDrawer.set(false)">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="dw-form-group">
+              <label class="dw-label">Delivery Method / Courier *</label>
+              <input type="text" class="dw-input" placeholder="e.g. In-Person Handover, DHL, FedEx, Local Courier" [ngModel]="waybillCarrier()" (ngModelChange)="waybillCarrier.set($event)" />
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Tracking Number / Reference (Optional)</label>
+              <input type="text" class="dw-input font-mono" placeholder="e.g. TRK-948201" [ngModel]="waybillPlate()" (ngModelChange)="waybillPlate.set($event)" />
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Courier / Contact Phone (Optional)</label>
+              <input type="text" class="dw-input" placeholder="e.g. +1 555 234 5678" [ngModel]="waybillDriver()" (ngModelChange)="waybillDriver.set($event)" />
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Handover Condition Notes</label>
+              <textarea class="dw-textarea" rows="3" placeholder="Describe item condition, serial number, or package contents..." [ngModel]="waybillChecklist()" (ngModelChange)="waybillChecklist.set($event)"></textarea>
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Upload Photo / Receipt *</label>
+              <input type="file" accept="image/*,.pdf" (change)="onWaybillFileSelected($event)" class="dw-input" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="showWaybillDrawer.set(false)">Cancel</button>
+            <button type="button" class="dw-btn dw-btn-primary" (click)="submitWaybillProof()">Submit Delivery Proof to Ledger &rarr;</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- RECORD PAYMENT MODAL -->
+    @if (showPaymentDrawer()) {
+      <div class="modal-backdrop" (click)="showPaymentDrawer.set(false)" role="dialog" aria-modal="true">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">Record Payment Transfer</h3>
+            <button type="button" class="modal-close" (click)="showPaymentDrawer.set(false)">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="dw-tabs mb-4">
+              <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'full'" (click)="setPaymentMode('full')">Full Amount</button>
+              <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'instalment'" (click)="setPaymentMode('instalment')">Partial / Milestone</button>
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Amount Paid ({{ details.deal.currency }}) *</label>
+              <input type="number" class="dw-input font-mono" placeholder="0.00" [ngModel]="paymentAmount()" (ngModelChange)="paymentAmount.set($event)" />
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Transfer Reference / Receipt ID *</label>
+              <input type="text" class="dw-input font-mono" placeholder="e.g. TXN-9841204" [ngModel]="paymentBankRef()" (ngModelChange)="paymentBankRef.set($event)" />
+              <span class="dw-field-hint">Bank transaction reference or NIP session ID.</span>
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Upload Payment Screenshot / Receipt *</label>
+              <input type="file" accept="image/*,.pdf" (change)="onPaymentReceiptSelected($event)" class="dw-input" />
+              <span class="dw-field-hint">Official bank transfer receipt or alert screenshot. Stored permanently on the audit ledger.</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="showPaymentDrawer.set(false)">Cancel</button>
+            <button type="button" class="dw-btn dw-btn-primary" [disabled]="paymentSubmitting()" (click)="submitPaymentReport()">
+              {{ paymentSubmitting() ? 'Recording on Ledger...' : 'Confirm & Record Bank Payment →' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- REPORT ISSUE / DISCREPANCY MODAL -->
+    @if (showDiscrepancyModal()) {
+      <div class="modal-backdrop" (click)="closeDiscrepancyModal()" role="dialog" aria-modal="true">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">Report an Issue with This Deal</h3>
+            <button type="button" class="modal-close" (click)="closeDiscrepancyModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <p class="text-xs text-secondary mb-4">
+              If the item condition does not match what was agreed, or a payment/delivery is missing, report it here. Submitting pauses trade funds and initiates the official Watchdog 7-Day Cure and Handover resolution window.
+            </p>
+            <div class="dw-form-group">
+              <label class="dw-label">What went wrong? *</label>
+              <select class="dw-select" [ngModel]="discrepancyType()" (ngModelChange)="discrepancyType.set($event)">
+                <option value="partial_delivery">Item condition does not match baseline photos</option>
+                <option value="delayed">Delivery is delayed or missing</option>
+                <option value="funds_not_seen">Payment transfer not received</option>
+              </select>
+            </div>
+            <div class="dw-form-group">
+              <label class="dw-label">Details & Evidence Notes *</label>
+              <textarea class="dw-textarea" rows="4" placeholder="Explain the issue clearly..." [ngModel]="discrepancyNotes()" (ngModelChange)="discrepancyNotes.set($event)"></textarea>
+              <span class="dw-field-hint">Be factual and specific. Recorded on the permanent regulatory dossier.</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="closeDiscrepancyModal()">Cancel</button>
+            <button type="button" class="dw-btn dw-btn-danger" [disabled]="discrepancySubmitting()" (click)="submitDiscrepancy()">
+              {{ discrepancySubmitting() ? 'Opening Case...' : 'Open Case & Freeze Transaction →' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- VIEW TERMS MODAL -->
+    @if (showTermsModal()) {
+      <div class="modal-backdrop" (click)="showTermsModal.set(false)" role="dialog" aria-modal="true">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">Agreed Deal Terms (v{{ details.deal.current_version }}.0)</h3>
+            <button type="button" class="modal-close" (click)="showTermsModal.set(false)">✕</button>
+          </div>
+          <div class="modal-body font-mono text-xs">
+            {{ details.current_version.terms_text || 'Standard buyer and seller protection rules apply.' }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="showTermsModal.set(false)">Close</button>
+            <button type="button" class="dw-btn dw-btn-primary" (click)="openTermsEdit()">Suggest Revision</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- EDIT TERMS MODAL -->
+    @if (showTermsEditModal()) {
+      <div class="modal-backdrop" (click)="closeTermsEdit()" role="dialog" aria-modal="true">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">Suggest Terms Revision (v{{ details.deal.current_version + 1 }}.0)</h3>
+            <button type="button" class="modal-close" (click)="closeTermsEdit()">✕</button>
+          </div>
+          <div class="modal-body">
+            <textarea class="dw-textarea font-mono text-xs" rows="7" [ngModel]="termsEditText()" (ngModelChange)="termsEditText.set($event)"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="closeTermsEdit()">Cancel</button>
+            <button type="button" class="dw-btn dw-btn-primary" [disabled]="termsEditSubmitting()" (click)="submitTermsRevision()">
+              {{ termsEditSubmitting() ? 'Saving...' : 'Save Revised Terms' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- BIOMETRIC STEP-UP MODAL -->
+    @if (showBiometricStepUpModal()) {
+      <div class="modal-backdrop" (click)="closeBiometricStepUp()" role="dialog" aria-modal="true">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">Confirm Identity to Sign Off</h3>
+            <button type="button" class="modal-close" (click)="closeBiometricStepUp()">✕</button>
+          </div>
+          <div class="modal-body">
+            <p class="text-xs text-secondary mb-4">
+              Quickly confirm your identity to lock in this action: <strong>{{ stepUpPendingAction()?.title }}</strong>
+            </p>
+
+            <div class="camera-viewport-box">
+              <video #stepUpVideo playsinline muted class="camera-video-elem" [class.d-none]="!stepUpCameraActive() || stepUpSelfie()"></video>
+              <canvas #stepUpCanvas class="d-none"></canvas>
+
+              @if (stepUpSelfie(); as selfie) {
+                <img [src]="selfie" alt="Captured Selfie" class="captured-selfie-preview" />
+              }
+
+              @if (stepUpCameraLoading()) {
+                <div class="camera-overlay-msg">
+                  <div class="spinner"></div>
+                  <span>Starting camera...</span>
+                </div>
+              }
+            </div>
+
+            @if (stepUpVerifying()) {
+              <div class="verifying-status-box mt-3">
+                <div class="spinner"></div>
+                <span>Verifying face match...</span>
+              </div>
+            }
+
+            @if (stepUpError(); as err) {
+              <div class="alert alert-danger mt-3">
+                <span>{{ err }}</span>
+              </div>
+            }
+
+            @if (!isProduction) {
+              <div class="mt-3 text-center">
+                <button type="button" class="dw-btn dw-btn-sm dw-btn-secondary" (click)="useSimulatedStepUpSnapshot()" [disabled]="stepUpVerifying() || stepUpVerified()">
+                  Quick Confirm (Test Mode)
+                </button>
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="dw-btn dw-btn-secondary" (click)="closeBiometricStepUp()">Cancel</button>
+            @if (stepUpCameraActive() && !stepUpSelfie()) {
+              <button type="button" class="dw-btn dw-btn-primary" (click)="captureStepUpPhoto()">Capture & Confirm</button>
+            } @else if (stepUpSelfie() && !stepUpVerified() && !stepUpVerifying()) {
+              <button type="button" class="dw-btn dw-btn-secondary" (click)="startStepUpCamera()">Retake</button>
+              <button type="button" class="dw-btn dw-btn-primary" (click)="submitBiometricStepUp()">Confirm</button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- PHOTO LIGHTBOX -->
+    @if (previewPhotoUrl(); as url) {
+      <div class="modal-backdrop" (click)="closeLightbox()">
+        <div class="lightbox-card" (click)="$event.stopPropagation()">
+          <button type="button" class="modal-close" (click)="closeLightbox()">✕</button>
+          <img [src]="url" alt="Evidence Preview" class="lightbox-img" />
+        </div>
+      </div>
+    }
+
+    <!-- Mobile Pinned Floating Action Capsule (HorizonX Detail View Pattern) -->
+    @if (details.deal.status === 'active' || (details.deal.status === 'awaiting_acceptance' && !hasCurrentUserAccepted())) {
+      <div class="hx-mobile-deal-floating-action">
+        @if (details.deal.status === 'awaiting_acceptance' && !hasCurrentUserAccepted()) {
+          <button type="button" class="hx-mobile-primary-btn" (click)="onSlideAcceptDeal(details.deal.id)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Review &amp; Sign Agreement</span>
+          </button>
+        } @else if (getDealRole(details.deal) === 'buying') {
+          <button type="button" class="hx-mobile-primary-btn" (click)="openPaymentDrawer()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="7" y1="17" x2="17" y2="7"/>
+              <polyline points="7 7 17 7 17 17"/>
+            </svg>
+            <span>Record Payment ({{ formatMoney(details.deal.amount, details.deal.currency) }})</span>
+          </button>
+        } @else if (getDealRole(details.deal) === 'supplying') {
+          <button type="button" class="hx-mobile-primary-btn" (click)="showWaybillDrawer.set(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span>Upload Delivery / Waybill Proof</span>
+          </button>
+        }
+      </div>
+    }
+
+  }
+
+</div>

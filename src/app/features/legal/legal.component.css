@@ -1,0 +1,146 @@
+/* ==========================================================================
+   Digital Watchdog — Legal & Privacy Center (legal.component.css)
+   ========================================================================== */
+
+.legal-page-wrapper {
+  min-height: 100vh;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+}
+
+.legal-top-bar {
+  height: var(--topbar-height, 56px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.legal-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.legal-logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.legal-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legal-container {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+  width: 100%;
+}
+
+.legal-header-banner {
+  text-align: center;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.legal-main-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.legal-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.legal-document-card {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.legal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legal-section h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.legal-section p,
+.legal-section li {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.legal-section ul {
+  margin: 2px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legal-highlight-box {
+  background: var(--status-info-bg);
+  border: 1px solid var(--status-info-border);
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legal-highlight-box strong {
+  color: var(--status-info);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .legal-top-bar {
+    padding: 0 14px;
+  }
+  .legal-brand-link .dw-badge {
+    display: none;
+  }
+  .legal-container {
+    padding: 24px 16px 60px;
+  }
+  .legal-document-card {
+    padding: 20px 16px;
+  }
+}

@@ -1,0 +1,402 @@
+<div class="dw-page-shell dw-narrow">
+
+  <!-- 1. Page Header -->
+  <header class="dw-page-header">
+    <div>
+      <h1 class="dw-page-title">Identity & Bank Verification</h1>
+      <p class="dw-page-subtitle">
+        Verify your identity and link your payout bank account to build instant trust and unlock higher deal limits.
+      </p>
+    </div>
+  </header>
+
+  <!-- 2. 2-Step Segmented Navigation -->
+  <nav class="verify-stepper dw-card" aria-label="Verification Steps">
+    <button
+      type="button"
+      class="step-tab-btn"
+      [class.active]="currentStep() === 1"
+      [class.done]="isBiometricVerified()"
+      (click)="setStep(1)"
+    >
+      <span class="step-num-circle">
+        {{ isBiometricVerified() ? '✓' : '1' }}
+      </span>
+      <div class="step-tab-texts">
+        <strong>Face Verification</strong>
+        <span>{{ isBiometricVerified() ? 'Verified' : 'Quick live camera check' }}</span>
+      </div>
+    </button>
+
+    <div class="step-divider"></div>
+
+    <button
+      type="button"
+      class="step-tab-btn"
+      [class.active]="currentStep() === 2"
+      [class.done]="isBankVerified()"
+      (click)="setStep(2)"
+    >
+      <span class="step-num-circle">
+        {{ isBankVerified() ? '✓' : '2' }}
+      </span>
+      <div class="step-tab-texts">
+        <strong>Payout Bank Account</strong>
+        <span>{{ isBankVerified() ? 'Account Linked' : 'Verify settlement bank' }}</span>
+      </div>
+    </button>
+  </nav>
+
+  <!-- 3. Main Verification Card -->
+  <div class="dw-card dw-card-padded verify-main-card">
+
+    <!-- ====================================================================
+         STEP 1: 3D FACE VERIFICATION
+         ==================================================================== -->
+    @if (currentStep() === 1) {
+
+      <!-- Case 1A: Already Verified -->
+      @if (isBiometricVerified() && !isRescanning() && !capturedSelfieBase64()) {
+        <div class="verify-state-center">
+          <div class="verify-badge-icon done">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+
+          <h2 class="state-title">Face Verification Complete</h2>
+          <p class="state-desc">
+            Your live facial verification is active and linked to your profile, protecting your agreements against impersonation.
+          </p>
+
+          <span class="dw-badge dw-badge-success">
+            <span class="dw-badge-dot"></span>
+            <span>3D Liveness Confirmed</span>
+          </span>
+
+          <div class="state-actions-row">
+            <button type="button" class="dw-btn dw-btn-primary" (click)="setStep(2)">
+              <span>Continue to Step 2: Payout Bank &rarr;</span>
+            </button>
+            <button type="button" class="dw-btn dw-btn-ghost" (click)="onInitiateRescan()">
+              Re-scan Face
+            </button>
+          </div>
+        </div>
+      } @else {
+
+        <!-- Case 1B: Pre-Scan Lobby -->
+        @if (!cameraActive() && !capturedSelfieBase64()) {
+          <div class="verify-state-center">
+            <div class="verify-badge-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M7 3H5a2 2 0 0 0-2 2v2m0 10v2a2 2 0 0 0 2 2h2m10 0h2a2 2 0 0 0 2-2v-2m0-10V5a2 2 0 0 0-2-2h-2"/>
+                <circle cx="12" cy="11" r="3.5"/>
+                <path d="M8.5 17.5c.8-1.5 2-2 3.5-2s2.7.5 3.5 2"/>
+              </svg>
+            </div>
+
+            <h2 class="state-title">Live Face Verification</h2>
+            <p class="state-desc">
+              A quick 5-second camera check confirms you are a real person and prevents fake accounts.
+            </p>
+
+            <div class="guidance-pills-row">
+              <span class="dw-badge dw-badge-neutral">Good lighting</span>
+              <span class="dw-badge dw-badge-neutral">Face clearly visible</span>
+              <span class="dw-badge dw-badge-neutral">Look straight ahead</span>
+            </div>
+
+            <div class="state-actions-row">
+              <button
+                type="button"
+                class="dw-btn dw-btn-primary dw-btn-lg"
+                (click)="startCamera()"
+                [disabled]="cameraLoading()"
+              >
+                @if (cameraLoading()) {
+                  <span class="spinner"></span>
+                  <span>Opening Camera...</span>
+                } @else {
+                  <span>Start Camera Check</span>
+                }
+              </button>
+
+              @if (isRescanning()) {
+                <button type="button" class="dw-btn dw-btn-secondary" (click)="cancelRescan()">
+                  Cancel
+                </button>
+              }
+            </div>
+
+            <div class="verify-footer-meta">
+              <span class="text-xs text-muted">Encrypted verification • Never shared publicly</span>
+              @if (!isProduction) {
+                <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="useSimulatedSnapshot()">
+                  Quick Pass (Test Mode)
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Case 1C: Active Camera Stream -->
+        @if (cameraActive() && !capturedSelfieBase64()) {
+          <div class="scanner-box">
+            <div class="camera-frame">
+              <video #videoElement class="camera-stream" autoplay playsinline muted></video>
+              <canvas #canvasElement class="camera-overlay-canvas"></canvas>
+
+              <div class="camera-directive-bar">
+                <span>{{ livenessService.feedbackMessage() || 'Center your face in the frame' }}</span>
+                <div class="directive-progress">
+                  <div class="directive-fill" [style.width.%]="livenessService.challengeProgress()"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="state-actions-row">
+              <button type="button" class="dw-btn dw-btn-primary" (click)="capturePhoto()">
+                <span>Capture Photo</span>
+              </button>
+              <button type="button" class="dw-btn dw-btn-secondary" (click)="stopCamera()">
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Case 1D: Review Captured Photo -->
+        @if (capturedSelfieBase64() && !livenessPassed()) {
+          <div class="scanner-box">
+            <div class="camera-frame">
+              <img [src]="capturedSelfieBase64()" class="camera-stream" alt="Captured Face" />
+            </div>
+
+            <div class="state-actions-row">
+              <button
+                type="button"
+                class="dw-btn dw-btn-primary"
+                (click)="runBiometricLiveness()"
+                [disabled]="livenessRunning()"
+              >
+                @if (livenessRunning()) {
+                  <span class="spinner"></span>
+                  <span>Verifying...</span>
+                } @else {
+                  <span>Confirm & Continue &rarr;</span>
+                }
+              </button>
+              <button
+                type="button"
+                class="dw-btn dw-btn-secondary"
+                (click)="retakePhoto()"
+                [disabled]="livenessRunning()"
+              >
+                Retake Photo
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Case 1E: Passed Celebration -->
+        @if (livenessPassed()) {
+          <div class="verify-state-center">
+            <div class="verify-badge-icon done">✓</div>
+            <h3 class="state-title">Face Verification Passed</h3>
+            <p class="state-desc">Continuing to Step 2...</p>
+          </div>
+        }
+
+      }
+    }
+
+    <!-- ====================================================================
+         STEP 2: PAYOUT BANK ACCOUNT
+         ==================================================================== -->
+    @if (currentStep() === 2) {
+
+      <!-- Case 2A: Already Linked Bank Account -->
+      @if (anchoredBankDetails(); as bank) {
+        @if (!isEditingBank()) {
+          <div class="bank-verified-wrap">
+            <div class="bank-summary-card">
+              <div class="bank-summary-top">
+                <span class="font-mono text-xs text-muted">VERIFIED PAYOUT ACCOUNT</span>
+                <span class="dw-badge dw-badge-success">
+                  <span class="dw-badge-dot"></span>
+                  <span>Active</span>
+                </span>
+              </div>
+
+              <strong class="bank-acc-num font-mono">{{ bank.accountNumber }}</strong>
+
+              <div class="bank-meta-grid">
+                <div>
+                  <span class="meta-lbl">Account Holder</span>
+                  <strong class="meta-val">{{ bank.accountName }}</strong>
+                </div>
+                <div>
+                  <span class="meta-lbl">Bank / Institution</span>
+                  <strong class="meta-val">{{ bank.bankName }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="state-actions-row">
+              <button type="button" class="dw-btn dw-btn-secondary" (click)="startEditingBank()">
+                <span>Update Bank Account</span>
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Case 2B: Connect or Edit Bank Account Form -->
+      @if (!anchoredBankDetails() || isEditingBank()) {
+        <div class="bank-form-wrap">
+          <div class="bank-form-head">
+            <h2 class="state-title">
+              {{ isEditingBank() ? 'Update Payout Bank Account' : 'Link Payout Bank Account' }}
+            </h2>
+            <p class="state-desc">
+              Select your bank and enter your account number so buyer payments go straight to your verified account.
+            </p>
+          </div>
+
+          <!-- 1. Bank Selection -->
+          <div class="dw-form-group">
+            <label class="dw-label">Select Bank or Financial Institution</label>
+
+            <div class="quick-banks-row">
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '058' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('058')">GTBank</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '057' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('057')">Zenith</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '044' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('044')">Access</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '011' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('011')">FirstBank</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '033' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('033')">UBA</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '50515' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('50515')">Moniepoint</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '999992' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('999992')">OPay</button>
+              <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedBankCode() === '50211' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="quickPickBank('50211')">Kuda</button>
+            </div>
+
+            <div class="bank-combobox">
+              @if (selectedBankCode() && !isBankMenuOpen()) {
+                <div class="selected-bank-pill" (click)="openBankMenu()">
+                  <strong>{{ selectedBankName() }}</strong>
+                  <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="clearBankSelection(); $event.stopPropagation()">
+                    Change
+                  </button>
+                </div>
+              } @else {
+                <input
+                  type="text"
+                  class="dw-input"
+                  placeholder="Search bank name..."
+                  [ngModel]="bankSearchQuery()"
+                  (ngModelChange)="bankSearchQuery.set($event)"
+                  (focus)="openBankMenu()"
+                  (blur)="closeBankMenu()"
+                />
+              }
+
+              @if (isBankMenuOpen()) {
+                <div class="bank-dropdown dw-card">
+                  @if (banksLoading()) {
+                    <div class="bank-dropdown-msg">Loading banks...</div>
+                  } @else if (filteredSupportedBanks().length === 0) {
+                    <div class="bank-dropdown-msg">No matching banks found</div>
+                  } @else {
+                    <div class="bank-options-scroll">
+                      @for (b of filteredSupportedBanks(); track b.code) {
+                        <button
+                          type="button"
+                          class="bank-option-row"
+                          [class.active]="selectedBankCode() === b.code"
+                          (mousedown)="selectBank(b)"
+                        >
+                          <span>{{ b.name }}</span>
+                          @if (selectedBankCode() === b.code) {
+                            <span class="text-emerald">✓</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- 2. Account Number -->
+          <div class="dw-form-group">
+            <label for="accNumInput" class="dw-label">10-Digit Account Number</label>
+            <input
+              id="accNumInput"
+              type="text"
+              class="dw-input font-mono"
+              [ngModel]="bankAccountNumber()"
+              (ngModelChange)="bankAccountNumber.set($event); onBankOrAccountChange()"
+              maxlength="10"
+              placeholder="0123456789"
+              [disabled]="bankVerifying()"
+            />
+            <div class="hint-between-row">
+              <span class="dw-field-hint">We automatically verify your account name with your bank.</span>
+              @if (!isProduction) {
+                <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="fillTestAccount()">
+                  Fill Test Account (Dev)
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- 3. Account Name Match Status -->
+          @if (resolvingName()) {
+            <div class="alert alert-info">
+              <span>Verifying account holder name...</span>
+            </div>
+          } @else if (resolvedNamePreview()) {
+            <div class="alert alert-success">
+              <div>
+                <span class="text-xs font-mono">VERIFIED ACCOUNT HOLDER:</span>
+                <strong class="d-block font-mono">{{ resolvedNamePreview() }}</strong>
+              </div>
+            </div>
+          }
+
+          @if (bankVerificationError()) {
+            <div class="alert alert-danger">
+              <span>{{ bankVerificationError() }}</span>
+            </div>
+          }
+
+          <div class="state-actions-row">
+            <button
+              type="button"
+              class="dw-btn dw-btn-primary dw-btn-lg"
+              (click)="submitBankAnchor()"
+              [disabled]="bankVerifying() || resolvingName() || bankAccountNumber().length !== 10 || !selectedBankCode()"
+            >
+              @if (bankVerifying()) {
+                <span class="spinner"></span>
+                <span>Saving Account...</span>
+              } @else {
+                <span>Save & Link Bank Account &rarr;</span>
+              }
+            </button>
+
+            @if (isEditingBank()) {
+              <button type="button" class="dw-btn dw-btn-secondary" (click)="cancelEditingBank()">
+                Cancel
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+    }
+
+  </div>
+
+</div>

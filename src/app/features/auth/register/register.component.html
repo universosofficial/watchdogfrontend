@@ -1,0 +1,331 @@
+<div class="auth-layout" [attr.data-theme]="themeService.currentTheme()">
+
+  <!-- Left Column: Brand & Accountability Showcase -->
+  <aside class="auth-showcase-col" aria-label="Watchdog Overview">
+    <div class="showcase-inner">
+      <a href="http://localhost:4300" class="auth-brand-link" title="Watchdog — Subsidiary of Univasos">
+        <img 
+          src="watchdog-logo.png" 
+          alt="Watchdog — Subsidiary of Univasos" 
+          class="auth-logo-img" 
+        />
+      </a>
+
+      <div class="showcase-body">
+        <span class="showcase-kicker font-mono">WATCHDOG • SUBSIDIARY OF UNIVASOS</span>
+        <h1 class="showcase-title">
+          Every deal deserves clear proof.
+        </h1>
+        <p class="showcase-desc">
+          Create agreements, verify condition at handover, and protect both buyers and sellers with a shared, tamper-proof timeline.
+        </p>
+
+        <div class="showcase-points">
+          <div class="sp-item">
+            <span class="sp-check">✓</span>
+            <span>100% free for everyday buyer & seller deals</span>
+          </div>
+          <div class="sp-item">
+            <span class="sp-check">✓</span>
+            <span>Works with any item, freelance project, or supply order</span>
+          </div>
+          <div class="sp-item">
+            <span class="sp-check">✓</span>
+            <span>Instant signing links for WhatsApp, SMS, or email</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-foot">
+        <span class="text-xs text-muted">&copy; 2026 Watchdog — Subsidiary of Univasos • Protected Agreements</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right Column: Registration Form -->
+  <main class="auth-form-col">
+    <div class="auth-top-bar">
+      <a href="http://localhost:4300" class="auth-mobile-brand" title="Watchdog Home">
+        <img src="watchdog-logo.png" alt="Watchdog — Subsidiary of Univasos" class="auth-mobile-logo" />
+      </a>
+      <a href="http://localhost:4300" class="dw-btn dw-btn-sm dw-btn-ghost auth-back-btn">
+        &larr; Back to Website
+      </a>
+
+      <button
+        type="button"
+        class="dw-btn dw-btn-sm dw-btn-secondary"
+        (click)="toggleTheme()"
+      >
+        <span>{{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}</span>
+      </button>
+    </div>
+
+    <div class="auth-card-wrap">
+
+      <!-- Step Indicator -->
+      <div class="reg-steps-row">
+        <span class="reg-step-pill" [class.active]="registrationStep() === 1">1. Your Details</span>
+        <span class="text-xs text-muted">&rarr;</span>
+        <span class="reg-step-pill" [class.active]="registrationStep() === 2">2. Verify Phone</span>
+      </div>
+
+      <!-- STEP 1: ACCOUNT DETAILS -->
+      @if (registrationStep() === 1) {
+        <div class="auth-header">
+          <h2 class="auth-title">Create your account</h2>
+          <p class="auth-subtitle">
+            Sign up with your phone number to start creating and signing agreements.
+          </p>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-danger">
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <!-- Segmented Account Type Toggle -->
+        <div class="dw-tabs w-100">
+          <button
+            type="button"
+            class="dw-tab-btn flex-1 justify-center"
+            [class.active]="accountType() === 'individual'"
+            (click)="setAccountType('individual')"
+          >
+            Individual / Personal
+          </button>
+          <button
+            type="button"
+            class="dw-tab-btn flex-1 justify-center"
+            [class.active]="accountType() === 'corporate'"
+            (click)="setAccountType('corporate')"
+          >
+            Business / Company
+          </button>
+        </div>
+
+        <form [formGroup]="step1Form" (ngSubmit)="onStep1Submit()" novalidate class="auth-form">
+
+          <!-- Full Name -->
+          <div class="dw-form-group">
+            <label class="dw-label">Full Name *</label>
+            <input
+              type="text"
+              class="dw-input"
+              formControlName="full_name"
+              placeholder="e.g. Alex Morgan"
+              autocomplete="name"
+              autofocus
+            />
+            @if (f1['full_name'].touched && f1['full_name'].invalid) {
+              <span class="dw-field-error">Please enter your full name.</span>
+            }
+          </div>
+
+          <!-- Phone Number -->
+          <div class="dw-form-group">
+            <label class="dw-label">Mobile Phone Number *</label>
+            <div class="phone-composite-row">
+              <select
+                class="dw-select country-select-box"
+                [value]="selectedCountry().code"
+                (change)="setCountry(countries[$any($event.target).selectedIndex])"
+                aria-label="Select Country"
+              >
+                @for (c of countries; track c.code) {
+                  <option [value]="c.code">{{ c.code }} ({{ c.dialCode }})</option>
+                }
+              </select>
+
+              <input
+                type="tel"
+                class="dw-input font-mono flex-1"
+                formControlName="phone"
+                placeholder="801 234 5678"
+                autocomplete="tel-national"
+              />
+            </div>
+            @if (f1['phone'].touched && f1['phone'].invalid) {
+              <span class="dw-field-error">Please enter a valid phone number.</span>
+            }
+          </div>
+
+          <!-- Business / Shop Name -->
+          <div class="dw-form-group">
+            <label class="dw-label">
+              {{ accountType() === 'corporate' ? 'Registered Company Name *' : 'Display / Shop Name (Optional)' }}
+            </label>
+            <input
+              type="text"
+              class="dw-input"
+              formControlName="business_name"
+              [placeholder]="accountType() === 'corporate' ? 'e.g. Apex Tech Solutions Ltd' : 'e.g. Alex Studio'"
+            />
+            @if (f1['business_name'].touched && f1['business_name'].invalid) {
+              <span class="dw-field-error">Company name is required for business accounts.</span>
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="dw-form-group">
+            <label class="dw-label">Password (at least 8 characters) *</label>
+            <div class="password-input-wrap">
+              <input
+                [type]="showPassword() ? 'text' : 'password'"
+                class="dw-input pr-toggle"
+                formControlName="password"
+                placeholder="Choose a strong password"
+                autocomplete="new-password"
+              />
+              <button type="button" class="btn-pw-toggle" (click)="toggleShowPassword()" tabindex="-1">
+                {{ showPassword() ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+            @if (f1['password'].touched && f1['password'].invalid) {
+              <span class="dw-field-error">Password must be at least 8 characters.</span>
+            }
+          </div>
+
+          <!-- Terms Consent -->
+          <div class="dw-form-group">
+            <label class="consent-label">
+              <input type="checkbox" formControlName="terms_accepted" />
+              <span>
+                I agree to the
+                <button type="button" class="link-btn" (click)="openLegalModal('terms', $event)">Terms of Service</button>
+                and
+                <button type="button" class="link-btn" (click)="openLegalModal('privacy', $event)">Privacy Policy</button>.
+              </span>
+            </label>
+            @if (f1['terms_accepted'].touched && f1['terms_accepted'].invalid) {
+              <span class="dw-field-error">Please accept the Terms and Privacy Policy to continue.</span>
+            }
+          </div>
+
+          <button type="submit" class="dw-btn dw-btn-primary dw-btn-lg w-100" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner"></span>
+              <span>Sending verification code...</span>
+            } @else {
+              <span>Continue &rarr;</span>
+            }
+          </button>
+        </form>
+      }
+
+      <!-- STEP 2: ENTER SMS CODE -->
+      @if (registrationStep() === 2) {
+        <div class="auth-header">
+          <h2 class="auth-title">Verify your phone</h2>
+          <p class="auth-subtitle">
+            Enter the 6-digit code sent to <strong class="font-mono">{{ formattedPhone() }}</strong>.
+          </p>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-danger">
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit()" novalidate class="auth-form">
+          <div class="dw-form-group">
+            <label class="dw-label">6-Digit Code</label>
+            <input
+              type="text"
+              class="dw-input font-mono text-center otp-box-input"
+              formControlName="otp"
+              placeholder="000000"
+              maxlength="6"
+              autofocus
+            />
+            @if (fOtp['otp'].touched && fOtp['otp'].invalid) {
+              <span class="dw-field-error">Please enter the 6-digit verification code.</span>
+            }
+          </div>
+
+          <div class="otp-meta-row">
+            <span class="text-xs text-muted">Expires in <strong class="font-mono">{{ formattedCountdown }}</strong></span>
+            <button
+              type="button"
+              class="link-btn"
+              [disabled]="countdown() > 0 || loading()"
+              (click)="resendCode()"
+            >
+              Resend Code
+            </button>
+          </div>
+
+          <button type="submit" class="dw-btn dw-btn-primary dw-btn-lg w-100 mt-3" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner"></span>
+              <span>Creating account...</span>
+            } @else {
+              <span>Confirm & Create Account &rarr;</span>
+            }
+          </button>
+
+          <button type="button" class="dw-btn dw-btn-ghost w-100 mt-3" (click)="backToStep1()">
+            &larr; Change Phone Number
+          </button>
+        </form>
+      }
+
+      <div class="auth-switch-row">
+        <span class="text-secondary">Already have an account?</span>
+        <a routerLink="/auth/login" class="auth-link">
+          Sign in &rarr;
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Legal Terms & Privacy Modal -->
+  @if (showLegalModal()) {
+    <div class="modal-backdrop" (click)="closeLegalModal()" role="dialog" aria-modal="true">
+      <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title">
+              {{ legalModalTab() === 'terms' ? 'Terms of Service' : 'Privacy Policy' }}
+            </h3>
+            <p class="modal-subtitle">Digital Watchdog Transaction Accountability Platform</p>
+          </div>
+          <button type="button" class="modal-close" (click)="closeLegalModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="dw-tabs mb-4">
+            <button type="button" class="dw-tab-btn" [class.active]="legalModalTab() === 'terms'" (click)="setLegalTab('terms')">
+              Terms of Service
+            </button>
+            <button type="button" class="dw-tab-btn" [class.active]="legalModalTab() === 'privacy'" (click)="setLegalTab('privacy')">
+              Privacy Policy
+            </button>
+          </div>
+
+          @if (legalModalTab() === 'terms') {
+            <div class="legal-copy-stack">
+              <p><strong>1. Non-Custodial Agreement Record:</strong> Digital Watchdog records shared agreements, condition checklists, and handover evidence between buyers and sellers. Payments move directly between verified bank accounts.</p>
+              <p><strong>2. Mutual Signatures:</strong> Agreements lock once both parties review and sign. Any revision requires both parties to re-approve.</p>
+              <p><strong>3. Active Resolution:</strong> If either party refuses to honor the signed terms, Digital Watchdog steps in using the timestamped photos, receipts, and timeline evidence.</p>
+            </div>
+          } @else {
+            <div class="legal-copy-stack">
+              <p><strong>1. Data Protection:</strong> Your contact information, identity verification, and deal records are encrypted and never sold to third parties.</p>
+              <p><strong>2. Camera Verification:</strong> Live facial verification is used strictly to confirm user identity and prevent impersonation.</p>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="dw-btn dw-btn-secondary" (click)="closeLegalModal()">Close</button>
+          <button type="button" class="dw-btn dw-btn-primary" (click)="acceptLegalAndClose()">Accept & Continue</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

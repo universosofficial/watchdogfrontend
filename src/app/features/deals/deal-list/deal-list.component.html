@@ -1,0 +1,226 @@
+<div class="dw-page-shell">
+
+  <!-- 1. Page Header -->
+  <header class="dw-page-header">
+    <div>
+      <h1 class="dw-page-title">All Deals</h1>
+      <p class="dw-page-subtitle">
+        Search, filter, and manage every purchase and sale agreement in one place.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="/deals/new" class="dw-btn dw-btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span>Start New Deal</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. High-Density Deals Ledger Table Card -->
+  <section class="dw-card" aria-label="Deals Table">
+
+    <!-- Filter & Search Toolbar -->
+    <div class="dw-toolbar">
+      <div class="dw-tabs" role="tablist">
+        @for (tab of statusTabs; track tab.value) {
+          <button
+            type="button"
+            role="tab"
+            class="dw-tab-btn"
+            [class.active]="selectedStatus() === tab.value"
+            (click)="onStatusChange(tab.value)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      <div class="toolbar-right-controls">
+        <!-- Role Filter -->
+        <select
+          class="dw-select role-filter-select"
+          [ngModel]="selectedRole()"
+          (ngModelChange)="selectedRole.set($event)"
+          aria-label="Filter by role"
+        >
+          <option value="all">All Roles</option>
+          <option value="buying">Buying</option>
+          <option value="selling">Selling</option>
+        </select>
+
+        <!-- Search Input -->
+        <div class="search-input-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            class="dw-input search-input"
+            placeholder="Search by item, partner, or ref..."
+            [value]="searchQuery()"
+            (input)="onSearchChange($event)"
+          />
+          @if (searchQuery()) {
+            <button type="button" class="btn-clear-search" (click)="searchQuery.set('')" title="Clear search">✕</button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filter Chips Bar (Mistake #11: Filters that are easy to reset) -->
+    @if (hasActiveFilters()) {
+      <div class="active-filters-bar">
+        <span class="filter-count-label">Active filters:</span>
+        @if (selectedStatus() !== 'all') {
+          <button type="button" class="filter-chip" (click)="onStatusChange('all')">
+            <span>Status: {{ selectedStatus() }}</span>
+            <span class="chip-x">&times;</span>
+          </button>
+        }
+        @if (selectedRole() !== 'all') {
+          <button type="button" class="filter-chip" (click)="selectedRole.set('all')">
+            <span>Role: {{ selectedRole() }}</span>
+            <span class="chip-x">&times;</span>
+          </button>
+        }
+        @if (searchQuery().trim()) {
+          <button type="button" class="filter-chip" (click)="searchQuery.set('')">
+            <span>Search: "{{ searchQuery() }}"</span>
+            <span class="chip-x">&times;</span>
+          </button>
+        }
+        <button type="button" class="btn-clear-all" (click)="resetAllFilters()">
+          Clear all filters
+        </button>
+      </div>
+    }
+
+    <!-- Loading State: Premium Shimmer Skeleton Table (Mistake #6) -->
+    @if (loading()) {
+      <div class="dw-skeleton-table" aria-label="Loading agreements">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <div class="dw-skeleton-table-row">
+            <span class="dw-skeleton dw-skeleton-text" style="width: 120px;"></span>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+              <span class="dw-skeleton dw-skeleton-title" [style.width.%]="45 + (i * 7)"></span>
+              <span class="dw-skeleton dw-skeleton-text" style="width: 180px;"></span>
+            </div>
+            <span class="dw-skeleton dw-skeleton-badge"></span>
+            <span class="dw-skeleton dw-skeleton-text" style="width: 60px;"></span>
+            <span class="dw-skeleton dw-skeleton-text" style="width: 90px;"></span>
+            <span class="dw-skeleton dw-skeleton-text" style="width: 40px;"></span>
+          </div>
+        }
+      </div>
+    } @else if (filteredDeals().length === 0) {
+      <!-- Empty State (Mistake #2: No way out of empty state -> Multi-path guidance) -->
+      @if (hasActiveFilters()) {
+        <dw-empty-state
+          title="No deals match your filters"
+          description="Try resetting your filters or clearing your search term to see all agreements."
+          actionLabel="Reset All Filters"
+          (actionClick)="resetAllFilters()"
+          secondaryActionLabel="+ Start New Deal"
+          secondaryActionRoute="/deals/new"
+        ></dw-empty-state>
+      } @else {
+        <dw-empty-state
+          title="No deals created yet"
+          description="Start your first agreement to record item details, handover checklists, and payment receipts."
+          actionLabel="+ Start a Protected Deal"
+          actionRoute="/deals/new"
+          secondaryActionLabel="See How It Works"
+          secondaryActionRoute="/how-it-works"
+        ></dw-empty-state>
+      }
+    } @else {
+      <!-- Linear / Stripe High-Density Table -->
+      <div class="deals-table-grid">
+        <div class="deals-grid-head">
+          <span>Reference</span>
+          <span>Deal & Partner</span>
+          <span>Role</span>
+          <span>Date</span>
+          <span>Status</span>
+          <span class="text-right">Amount</span>
+          <span class="text-right">Action</span>
+        </div>
+
+        @for (deal of filteredDeals(); track deal.id) {
+          <div class="deals-grid-row" (click)="openDeal(deal.id)">
+            <!-- Col 1: Reference -->
+            <div class="col-ref font-mono text-xs text-muted">
+              {{ deal.reference_no }}
+            </div>
+
+            <!-- Col 2: Title & Counterparty -->
+            <div class="col-main">
+              <strong class="deal-title">{{ deal.title }}</strong>
+              <span class="deal-partner">
+                With {{ getDealRole(deal) === 'buying'
+                  ? (deal.counterparty_business_name || deal.creator_business_name || 'Seller')
+                  : (deal.creator_business_name || deal.counterparty_business_name || 'Buyer') }}
+              </span>
+            </div>
+
+            <!-- Col 3: Role -->
+            <div class="col-role">
+              <span class="role-pill" [class.buying]="getDealRole(deal) === 'buying'">
+                {{ getDealRole(deal) === 'buying' ? 'Buying' : 'Selling' }}
+              </span>
+            </div>
+
+            <!-- Col 4: Date -->
+            <div class="col-date text-xs text-muted">
+              {{ formatDate(deal.created_at) }}
+            </div>
+
+            <!-- Col 5: Status -->
+            <div class="col-status">
+              <dw-status-badge [status]="deal.status"></dw-status-badge>
+            </div>
+
+            <!-- Col 6: Amount -->
+            <div class="col-amount font-mono text-right font-semibold">
+              {{ formatCurrency(deal.amount, deal.currency) }}
+            </div>
+
+            <!-- Col 7: Quick Actions -->
+            <div class="col-actions text-right" (click)="$event.stopPropagation()">
+              @if (deal.status === 'draft' || deal.status === 'awaiting_acceptance') {
+                <button
+                  type="button"
+                  class="dw-btn dw-btn-sm dw-btn-ghost"
+                  (click)="copyDealLink(deal.id, $event)"
+                  title="Copy signing link"
+                >
+                  Copy Link
+                </button>
+              }
+              <a [routerLink]="['/deals', deal.id]" class="dw-btn dw-btn-sm dw-btn-secondary">
+                Open &rarr;
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Table Footer Summary -->
+      <div class="deals-table-footer">
+        <span class="text-xs text-muted">
+          Showing <strong>{{ filteredDeals().length }}</strong> of <strong>{{ totalCount() }}</strong> deals
+        </span>
+        <span class="text-xs text-muted font-mono">
+          Total Volume: <strong>{{ formatCurrency(totalSecuredVolume()) }}</strong>
+        </span>
+      </div>
+    }
+
+  </section>
+
+</div>

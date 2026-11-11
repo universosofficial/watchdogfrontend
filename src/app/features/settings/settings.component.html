@@ -1,0 +1,518 @@
+<div class="dw-page-shell">
+
+  <!-- 1. Page Header -->
+  <header class="dw-page-header">
+    <div>
+      <h1 class="dw-page-title">Account & Workspace Settings</h1>
+      <p class="dw-page-subtitle">
+        Manage your profile details, team members, protection rules, messaging alerts, and developer API keys.
+      </p>
+    </div>
+
+    @if (business(); as biz) {
+      <div class="dw-badge dw-badge-success">
+        <span class="dw-badge-dot"></span>
+        <span>{{ biz.name }} • Active Workspace</span>
+      </div>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="dw-card dw-card-padded text-center">
+      <div class="spinner"></div>
+      <p class="text-xs text-muted mt-3">Loading workspace settings...</p>
+    </div>
+  } @else {
+
+    <!-- 2. Category Tabs Navigation -->
+    <div class="settings-tabs-bar">
+      <div class="dw-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'profile'"
+          (click)="setActiveTab('profile')"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <span>Workspace Entity</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'signatories'"
+          (click)="setActiveTab('signatories')"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Team Members ({{ members().length }})</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'security'"
+          (click)="setActiveTab('security')"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Protection Rules</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'bots'"
+          (click)="setActiveTab('bots')"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>WhatsApp & Telegram Alerts</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'developer'"
+          (click)="setActiveTab('developer')"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <span>API & Webhooks</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Settings Content Area -->
+    <div class="settings-content-area">
+
+      <!-- TAB 1: WORKSPACE & BUSINESS DETAILS -->
+      @if (activeTab() === 'profile') {
+        <div class="dw-card dw-card-padded settings-narrow-card">
+          <!-- Profile Quick Link Banner -->
+          <div class="settings-profile-callout">
+            <div class="callout-icon">👤</div>
+            <div class="callout-body">
+              <strong>Personal Profile &amp; Verification Anchors</strong>
+              <p>Looking to edit your legal name, contact phone, or review your locked 3D face and settlement bank anchors?</p>
+            </div>
+            <a routerLink="/profile" class="dw-btn dw-btn-sm dw-btn-primary">Open Profile &rarr;</a>
+          </div>
+
+          <div class="section-head mt-4">
+            <div>
+              <h2 class="dw-card-title">Trading Entity Details</h2>
+              <p class="dw-card-subtitle">Shown on your commercial contracts and invoices.</p>
+            </div>
+            <span class="dw-badge dw-badge-success">Active Entity</span>
+          </div>
+
+          <form [formGroup]="businessForm" (ngSubmit)="onSaveProfile()" novalidate class="mt-3">
+            <div class="dw-form-group">
+              <label class="dw-label" for="biz-name">Display Name / Business Name *</label>
+              <input
+                type="text"
+                id="biz-name"
+                class="dw-input"
+                formControlName="name"
+              />
+            </div>
+
+            <div class="dw-form-group">
+              <label class="dw-label" for="biz-rc">Business Registration Number (Optional)</label>
+              <input
+                type="text"
+                id="biz-rc"
+                class="dw-input font-mono"
+                formControlName="rc_number"
+                placeholder="e.g. REG-1849204"
+              />
+              <span class="dw-field-hint">Optional for individuals; displayed on commercial B2B contracts.</span>
+            </div>
+
+            <div class="dw-form-group">
+              <label class="dw-label" for="biz-address">Primary Address (Optional)</label>
+              <textarea
+                id="biz-address"
+                class="dw-textarea"
+                rows="3"
+                formControlName="address"
+              ></textarea>
+            </div>
+
+            <div class="form-footer-right">
+              <button type="submit" class="dw-btn dw-btn-primary" [disabled]="saving()">
+                {{ saving() ? 'Saving Changes...' : 'Save Profile' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      <!-- TAB 2: TEAM MEMBERS & SIGNATORIES -->
+      @if (activeTab() === 'signatories') {
+        <div class="dw-card dw-card-padded settings-narrow-card">
+          <div class="section-head">
+            <div>
+              <h2 class="dw-card-title">Authorized Team Members</h2>
+              <p class="dw-card-subtitle">Invite colleagues who can create, sign, or confirm deals on behalf of your workspace.</p>
+            </div>
+            <span class="dw-badge dw-badge-neutral">{{ members().length }} Members</span>
+          </div>
+
+          <form [formGroup]="inviteForm" (ngSubmit)="onInviteMember()" class="invite-inline-box" novalidate>
+            <input
+              type="email"
+              class="dw-input flex-2"
+              formControlName="email"
+              placeholder="colleague@company.com"
+            />
+            <select class="dw-select flex-1" formControlName="role">
+              <option value="staff">Member / Manager</option>
+              <option value="owner">Owner / Admin</option>
+            </select>
+            <button type="submit" class="dw-btn dw-btn-primary" [disabled]="inviting()">
+              {{ inviting() ? 'Adding...' : '+ Add Member' }}
+            </button>
+          </form>
+
+          <div class="members-divided-list">
+            @for (m of members(); track m.id) {
+              <div class="member-row">
+                <div class="member-avatar">
+                  {{ (m.full_name || m.email || 'U').substring(0, 2).toUpperCase() }}
+                </div>
+                <div class="member-info">
+                  <strong>{{ m.full_name || 'Workspace Member' }}</strong>
+                  <span class="font-mono text-xs text-muted">{{ m.email }}</span>
+                </div>
+                <span class="dw-badge dw-badge-neutral">{{ m.role | uppercase }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- TAB 3: PROTECTION RULES -->
+      @if (activeTab() === 'security') {
+        <div class="dw-card dw-card-padded settings-narrow-card">
+          <div class="section-head">
+            <div>
+              <h2 class="dw-card-title">Active Deal Protection Rules</h2>
+              <p class="dw-card-subtitle">Enforced automatically on every agreement created in your workspace.</p>
+            </div>
+            <span class="dw-badge dw-badge-success">Active</span>
+          </div>
+
+          <div class="rules-stack">
+            <div class="rule-item">
+              <div class="rule-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+              </div>
+              <div>
+                <strong>Mutual Digital Signatures</strong>
+                <p>Agreements only become active once both the buyer and seller review and sign the exact same terms.</p>
+              </div>
+            </div>
+
+            <div class="rule-item">
+              <div class="rule-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <div>
+                <strong>Tamper-Proof Handover Photos</strong>
+                <p>Delivery photos, serial numbers, and payment receipts are permanently timestamped in the deal timeline.</p>
+              </div>
+            </div>
+
+            <div class="rule-item">
+              <div class="rule-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              </div>
+              <div>
+                <strong>Active Watchdog Resolution</strong>
+                <p>If either party refuses to honor the agreement, Digital Watchdog steps in with your recorded timeline proof.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- TAB 4: WHATSAPP, TELEGRAM & EMAIL ALERTS -->
+      @if (activeTab() === 'bots') {
+        <div class="dw-card dw-card-padded">
+          <div class="section-head">
+            <div>
+              <h2 class="dw-card-title">Chat & Email Notifications</h2>
+              <p class="dw-card-subtitle">Create deals, upload handover photos, and receive instant alerts on WhatsApp, Telegram, and Email.</p>
+            </div>
+            <span class="dw-badge dw-badge-success">3 Channels Active</span>
+          </div>
+
+          <div class="channels-grid">
+            <div class="channel-card">
+              <div class="channel-top">
+                <strong>WhatsApp Assistant</strong>
+                <span class="dw-badge dw-badge-success">Connected</span>
+              </div>
+              <p>Create agreements, receive OTP codes, and upload delivery photos directly from WhatsApp.</p>
+              <code class="font-mono text-xs channel-code">CREATE DEAL • ACCEPT [REF] • CONFIRM</code>
+            </div>
+
+            <div class="channel-card">
+              <div class="channel-top">
+                <strong>Telegram Watchdog Bot</strong>
+                <span class="dw-badge dw-badge-success">Connected</span>
+              </div>
+              <p>1-click inline buttons to accept agreements, confirm payments, and get real-time delivery updates.</p>
+              <code class="font-mono text-xs channel-code">&#64;WatchdogEscrowBot</code>
+            </div>
+
+            <div class="channel-card">
+              <div class="channel-top">
+                <strong>Transactional Email Alerts</strong>
+                <span class="dw-badge dw-badge-success">Connected</span>
+              </div>
+              <p>Sends instant signing links and payment confirmation receipts straight to both parties' inboxes.</p>
+              <code class="font-mono text-xs channel-code">notifications&#64;digitalwatchdog.io</code>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- TAB 5: DEVELOPER API & WEBHOOKS -->
+      @if (activeTab() === 'developer') {
+        <div class="dev-stack">
+
+          <!-- API Keys Card -->
+          <div class="dw-card dw-card-padded">
+            <div class="section-head">
+              <div>
+                <h2 class="dw-card-title">API Keys</h2>
+                <p class="dw-card-subtitle">Authenticate server-to-server requests from your marketplace or checkout backend.</p>
+              </div>
+              <button type="button" class="dw-btn dw-btn-primary" (click)="openCreateKeyModal()">
+                + Generate Secret Key
+              </button>
+            </div>
+
+            @if (loadingKeys()) {
+              <div class="py-4 text-center text-xs text-muted">Loading API keys...</div>
+            } @else if (apiKeys().length === 0) {
+              <div class="empty-inline-box">
+                <strong>No API Keys Generated Yet</strong>
+                <p>Create a secret key to integrate Digital Watchdog agreements into your platform.</p>
+              </div>
+            } @else {
+              <div class="table-responsive mt-3">
+                <table class="dw-table">
+                  <thead>
+                    <tr>
+                      <th>Key Name</th>
+                      <th>Prefix</th>
+                      <th>Environment</th>
+                      <th>Created</th>
+                      <th class="text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (k of apiKeys(); track k.id) {
+                      <tr>
+                        <td class="font-medium">{{ k.name }}</td>
+                        <td>
+                          <code class="font-mono text-xs">{{ k.key_prefix }}</code>
+                          <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost ml-2" (click)="copyToClipboard(k.key_prefix, k.id)">
+                            {{ copiedState() === k.id ? 'Copied' : 'Copy' }}
+                          </button>
+                        </td>
+                        <td>
+                          <span class="dw-badge" [ngClass]="k.environment === 'live' ? 'dw-badge-success' : 'dw-badge-neutral'">
+                            {{ k.environment === 'live' ? 'Live' : 'Test' }}
+                          </span>
+                        </td>
+                        <td class="text-xs text-muted font-mono">{{ k.created_at | date:'mediumDate' }}</td>
+                        <td class="text-right">
+                          <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost text-crimson" (click)="onRevokeApiKey(k.id, k.name)">
+                            Revoke
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+
+          <!-- Webhooks Card -->
+          <div class="dw-card dw-card-padded">
+            <div class="section-head">
+              <div>
+                <h2 class="dw-card-title">Webhook Endpoints</h2>
+                <p class="dw-card-subtitle">Receive real-time signed callbacks when deals are signed, paid, or completed.</p>
+              </div>
+              <button type="button" class="dw-btn dw-btn-secondary" (click)="openCreateWebhookModal()">
+                + Add Endpoint
+              </button>
+            </div>
+
+            @if (loadingWebhooks()) {
+              <div class="py-4 text-center text-xs text-muted">Loading webhooks...</div>
+            } @else if (webhooks().length === 0) {
+              <div class="empty-inline-box">
+                <strong>No Webhook Endpoints Configured</strong>
+                <p>Register an HTTPS URL to receive real-time event notifications.</p>
+              </div>
+            } @else {
+              <div class="webhooks-list mt-3">
+                @for (wh of webhooks(); track wh.id) {
+                  <div class="webhook-row-card">
+                    <div class="wh-top">
+                      <code class="font-mono text-xs">{{ wh.url }}</code>
+                      <div class="wh-actions">
+                        <button type="button" class="dw-btn dw-btn-sm dw-btn-secondary" [disabled]="testingPingEndpointId() === wh.id" (click)="onTestWebhookPing(wh.id)">
+                          {{ testingPingEndpointId() === wh.id ? 'Sending...' : 'Send Test Ping' }}
+                        </button>
+                        <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost text-crimson" (click)="onDeleteWebhook(wh.id)">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Code Snippets Card -->
+          <div class="dw-card dw-card-padded">
+            <div class="section-head">
+              <div>
+                <h2 class="dw-card-title">Quickstart Example</h2>
+                <p class="dw-card-subtitle">Create a protected deal via the REST API.</p>
+              </div>
+              <div class="dw-tabs">
+                <button type="button" class="dw-tab-btn" [class.active]="selectedSnippetLang() === 'curl'" (click)="selectedSnippetLang.set('curl')">cURL</button>
+                <button type="button" class="dw-tab-btn" [class.active]="selectedSnippetLang() === 'node'" (click)="selectedSnippetLang.set('node')">Node.js</button>
+                <button type="button" class="dw-tab-btn" [class.active]="selectedSnippetLang() === 'python'" (click)="selectedSnippetLang.set('python')">Python</button>
+              </div>
+            </div>
+
+            <div class="code-box font-mono text-xs mt-3">
+              <div class="code-box-head">
+                <span>POST /api/v1/deals</span>
+                <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="copyCurrentSnippet()">
+                  {{ copiedState() === 'snippet_copy' ? '✓ Copied' : 'Copy' }}
+                </button>
+              </div>
+              <pre><code>{{ getSnippetCode(selectedSnippetLang()) }}</code></pre>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- MODAL: GENERATE API KEY -->
+      @if (showNewKeyModal()) {
+        <div class="modal-backdrop" (click)="closeCreateKeyModal()" role="dialog" aria-modal="true">
+          <div class="modal-dialog" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3 class="modal-title">{{ newlyCreatedKey() ? 'Save Your Secret Key' : 'Generate New API Key' }}</h3>
+              <button type="button" class="modal-close" (click)="closeCreateKeyModal()">✕</button>
+            </div>
+
+            @if (newlyCreatedKey(); as key) {
+              <div class="modal-body">
+                <p class="text-xs text-secondary mb-4">Copy and store this key safely—it will only be shown once.</p>
+                <div class="key-reveal-box">
+                  <code class="font-mono text-xs">{{ key.api_key }}</code>
+                  <button type="button" class="dw-btn dw-btn-sm dw-btn-primary" (click)="copyToClipboard(key.api_key || '', 'modal_raw_key')">
+                    {{ copiedState() === 'modal_raw_key' ? '✓ Copied' : 'Copy' }}
+                  </button>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="dw-btn dw-btn-primary" (click)="closeCreateKeyModal()">Done</button>
+              </div>
+            } @else {
+              <form [formGroup]="newKeyForm" (ngSubmit)="onCreateApiKey()">
+                <div class="modal-body">
+                  <div class="dw-form-group">
+                    <label class="dw-label">Key Name *</label>
+                    <input type="text" class="dw-input" formControlName="name" placeholder="e.g. Production Checkout Key" />
+                  </div>
+                  <div class="dw-form-group">
+                    <label class="dw-label">Environment *</label>
+                    <select class="dw-select" formControlName="environment">
+                      <option value="live">Live Production</option>
+                      <option value="test">Test Sandbox</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="dw-btn dw-btn-secondary" (click)="closeCreateKeyModal()">Cancel</button>
+                  <button type="submit" class="dw-btn dw-btn-primary" [disabled]="generatingKey()">
+                    {{ generatingKey() ? 'Generating...' : 'Generate Key' }}
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- MODAL: REGISTER WEBHOOK -->
+      @if (showNewWebhookModal()) {
+        <div class="modal-backdrop" (click)="closeCreateWebhookModal()" role="dialog" aria-modal="true">
+          <div class="modal-dialog" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3 class="modal-title">Add Webhook Endpoint</h3>
+              <button type="button" class="modal-close" (click)="closeCreateWebhookModal()">✕</button>
+            </div>
+            <form [formGroup]="newWebhookForm" (ngSubmit)="onRegisterWebhook()">
+              <div class="modal-body">
+                <div class="dw-form-group">
+                  <label class="dw-label">Endpoint HTTPS URL *</label>
+                  <input type="url" class="dw-input font-mono" formControlName="url" placeholder="https://your-site.com/api/webhooks/watchdog" />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="dw-btn dw-btn-secondary" (click)="closeCreateWebhookModal()">Cancel</button>
+                <button type="submit" class="dw-btn dw-btn-primary" [disabled]="registeringWebhook()">
+                  {{ registeringWebhook() ? 'Saving...' : 'Save Endpoint' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+
+    </div>
+
+  }
+
+</div>

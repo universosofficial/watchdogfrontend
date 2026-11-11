@@ -1,0 +1,204 @@
+<div class="legal-page-wrapper" [attr.data-theme]="themeService.currentTheme()">
+
+  <!-- Top Header Navigation -->
+  <header class="legal-top-bar">
+    <a routerLink="/" class="legal-brand-link" title="Watchdog — Subsidiary of Univasos">
+      <img 
+        src="watchdog-logo.png" 
+        alt="Watchdog — Subsidiary of Univasos" 
+        class="legal-logo-img" 
+      />
+      <span class="dw-badge dw-badge-neutral">Legal</span>
+    </a>
+
+    <div class="legal-top-actions">
+      <button
+        type="button"
+        class="dw-btn dw-btn-sm dw-btn-secondary"
+        (click)="themeService.toggleTheme()"
+      >
+        {{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}
+      </button>
+
+      <a routerLink="/auth/register" class="dw-btn dw-btn-sm dw-btn-primary">
+        &larr; Back to Account Setup
+      </a>
+    </div>
+  </header>
+
+  <!-- Legal Container -->
+  <main class="legal-container">
+
+    <!-- Header Banner -->
+    <div class="legal-header-banner">
+      <h1 class="legal-main-title">
+        {{ activeTab() === 'terms' ? 'Commercial Terms of Service' : 'Platform Privacy Policy' }}
+      </h1>
+      <p class="legal-subtitle">
+        Effective Date: October 28, 2026 • Bilateral Agreement & Data Protection Standards
+      </p>
+
+      <!-- Tab Switcher -->
+      <div class="dw-tabs mt-2">
+        <button
+          type="button"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'terms'"
+          (click)="setTab('terms')"
+        >
+          Terms of Service
+        </button>
+        <button
+          type="button"
+          class="dw-tab-btn"
+          [class.active]="activeTab() === 'privacy'"
+          (click)="setTab('privacy')"
+        >
+          Privacy Policy
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT SECTION: TERMS OF SERVICE -->
+    @if (activeTab() === 'terms') {
+      <article class="dw-card legal-document-card">
+        <div class="legal-section">
+          <h2>1. Introduction & Non-Custodial Neutral Protocol</h2>
+          <p>
+            Welcome to <strong>Digital Watchdog</strong> ("the Platform", "we", "our"). Digital Watchdog is an independent transaction accountability ledger and bilateral agreement facilitation platform.
+          </p>
+          <div class="legal-highlight-box">
+            <strong>Non-Custodial Direct Settlement Disclosure</strong>
+            <span>Digital Watchdog is not a bank or custodial escrow wallet. We do not hold, collect, or custody trading funds. Payments occur directly between buyer and seller using verified bank accounts or agreed payment methods, while Digital Watchdog records tamper-proof agreements, photos, and receipts.</span>
+          </div>
+        </div>
+
+        <div class="legal-section">
+          <h2>2. User Accounts & Verification</h2>
+          <p>
+            By creating an account, you confirm that you are an individual or authorized business representative conducting legitimate transactions.
+          </p>
+          <ul>
+            <li><strong>Phone Verification:</strong> Buyers and sellers register and sign agreements using verified mobile phone authentication (OTP).</li>
+            <li><strong>Seller & Business Verification:</strong> Users can link a verified payout bank account and complete identity verification to increase transaction limits and display a verified badge.</li>
+            <li><strong>Accurate Representation:</strong> Registering with false identity details or directing payments to unauthorized third-party accounts will result in immediate account suspension.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>3. Bilateral Agreements & Version Locking</h2>
+          <p>
+            Deal terms proposed within the platform become binding once digitally accepted by both parties:
+          </p>
+          <ul>
+            <li><strong>Agreement Locking:</strong> Digital acceptance locks the agreed item description, condition disclosures, delivery expectations, and price (Version 1.0).</li>
+            <li><strong>Terms Revisions:</strong> Either party may propose updated terms prior to completion. Submitting a revision creates a new version (e.g. Version 2.0) that requires mutual sign-off to take effect.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>4. Handover, Delivery Proof & Inspection</h2>
+          <p>
+            Both parties agree to document fulfillment transparently:
+          </p>
+          <ul>
+            <li><strong>Delivery & Handover Proof:</strong> Sellers attach handover photos, serial numbers, or courier tracking information before or during delivery.</li>
+            <li><strong>Inspection Window:</strong> Upon delivery, the buyer is granted the agreed inspection window (default 48 hours) to verify that the item or service matches the locked agreement.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>5. Direct Payment Records</h2>
+          <p>
+            When a buyer records a payment on the platform:
+          </p>
+          <ul>
+            <li>The buyer provides the transfer reference and attaches the payment receipt or screenshot.</li>
+            <li>The seller confirms receipt of funds in the Deal Room once credited.</li>
+            <li>Submitting fabricated receipts or refusing to acknowledge verified payments negatively impacts account standing.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>6. Case Resolution & Enforcement</h2>
+          <p>
+            If an item arrives damaged, differs from the locked description, or a party refuses to honor the agreement:
+          </p>
+          <ul>
+            <li><strong>72-Hour Direct Cure Window:</strong> Flagging an issue opens a structured resolution window so both sides can arrange a replacement, repair, or refund directly.</li>
+            <li><strong>Watchdog Case Takeover:</strong> If the issue is not resolved within the cure window, Digital Watchdog compiles the signed agreement, timestamped photos, and payment records to assist with formal recovery and dispute enforcement.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>7. Limitation of Liability</h2>
+          <p>
+            Digital Watchdog provides an evidentiary agreement ledger, identity verification workflow, and structured case resolution support. Our aggregate liability is limited to platform fees paid by the user in the preceding 12 months.
+          </p>
+        </div>
+      </article>
+    }
+
+    <!-- CONTENT SECTION: PRIVACY POLICY -->
+    @if (activeTab() === 'privacy') {
+      <article class="dw-card legal-document-card">
+        <div class="legal-section">
+          <h2>1. Commitment to Data Privacy</h2>
+          <p>
+            Digital Watchdog respects your personal and commercial privacy. This Privacy Policy explains how we collect, use, and protect your data in accordance with international data protection regulations (including GDPR and NDPA standards).
+          </p>
+        </div>
+
+        <div class="legal-section">
+          <h2>2. Information We Collect</h2>
+          <p>We collect only the information needed to secure your agreements and verify counterparties:</p>
+          <ul>
+            <li><strong>Account Information:</strong> Full name, mobile phone number, email address (optional), and encrypted password credentials.</li>
+            <li><strong>Business Details:</strong> Optional shop or company registration details provided for business verification.</li>
+            <li><strong>Payout Bank Details:</strong> Account number and bank name provided by sellers so buyers can verify the rightful recipient before paying.</li>
+            <li><strong>Deal Evidence:</strong> Item photos, delivery proofs, payment receipts, and agreement messages uploaded to a Deal Room.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>3. Biometric & Identity Verification Safeguards</h2>
+          <div class="legal-highlight-box">
+            <strong>Encrypted Identity Verification</strong>
+            <span>Camera liveness checks are used solely to confirm that an account holder is a real person and prevent impersonation. We never sell or share biometric data with advertisers or third-party marketers.</span>
+          </div>
+        </div>
+
+        <div class="legal-section">
+          <h2>4. How We Use Your Information</h2>
+          <p>Your information is used strictly to:</p>
+          <ul>
+            <li>Generate tamper-proof bilateral agreements between buyers and sellers.</li>
+            <li>Verify account ownership and display accurate verification badges.</li>
+            <li>Send real-time deal notifications via SMS, WhatsApp, or Telegram.</li>
+            <li>Provide certified PDF receipts and audit logs when resolving a disputed transaction.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>5. Data Sharing & Confidentiality</h2>
+          <p>
+            We do <strong>not</strong> sell your personal or transaction data. Information is shared only with:
+          </p>
+          <ul>
+            <li><strong>Your Deal Counterparty:</strong> The specific buyer or seller in your active deal receives access to the shared Deal Room and payment details needed to complete the transaction.</li>
+            <li><strong>Verification Infrastructure:</strong> Regulated identity and banking verification partners used to validate account ownership.</li>
+            <li><strong>Legal & Dispute Authorities:</strong> When required by law or authorized by a party during formal dispute recovery.</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>6. Security & Contact</h2>
+          <p>
+            All data in transit is encrypted via TLS 1.3 and stored with AES-256 encryption at rest. For privacy inquiries, data export requests, or account deletion, contact our Data Protection Team at <strong class="font-mono">privacy&#64;digitalwatchdog.io</strong>.
+          </p>
+        </div>
+      </article>
+    }
+
+  </main>
+</div>

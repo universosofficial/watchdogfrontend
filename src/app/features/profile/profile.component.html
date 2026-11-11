@@ -1,0 +1,255 @@
+<div class="dw-page-shell dw-narrow" [attr.data-theme]="themeService.currentTheme()">
+
+  <!-- 1. Header with Avatar -->
+  <header class="profile-header dw-card dw-card-padded">
+    <div class="profile-header-left">
+      <div class="profile-avatar-wrap">
+        <div 
+          class="profile-avatar-circle" 
+          (click)="avatarInput.click()" 
+          title="Upload or change profile picture (Cloudinary)"
+          role="button"
+          tabindex="0"
+        >
+          @if (authService.currentUser()?.avatar_url) {
+            <img 
+              [src]="authService.currentUser()?.avatar_url" 
+              [alt]="authService.currentUser()?.full_name" 
+              class="profile-avatar-img" 
+            />
+          } @else {
+            <span class="avatar-initials">{{ getUserInitials() }}</span>
+          }
+
+          <div class="avatar-camera-overlay" [class.is-uploading]="uploadingAvatar()">
+            @if (uploadingAvatar()) {
+              <div class="avatar-spinner"></div>
+            } @else {
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            }
+          </div>
+        </div>
+
+        <input
+          #avatarInput
+          type="file"
+          accept="image/png, image/jpeg, image/jpg, image/webp"
+          (change)="onAvatarSelected($event)"
+          style="display: none;"
+          aria-label="Upload profile photo"
+        />
+      </div>
+
+      <div class="profile-header-meta">
+        <h1 class="profile-name">{{ authService.currentUser()?.full_name || 'My Profile' }}</h1>
+        <span class="profile-email font-mono">{{ authService.currentUser()?.email || authService.currentUser()?.phone }}</span>
+
+        <div class="profile-avatar-actions">
+          <button 
+            type="button" 
+            class="btn-avatar-action" 
+            (click)="avatarInput.click()" 
+            [disabled]="uploadingAvatar()"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span>{{ uploadingAvatar() ? 'Uploading...' : (authService.currentUser()?.avatar_url ? 'Change Photo' : 'Upload Photo') }}</span>
+          </button>
+
+          @if (authService.currentUser()?.avatar_url) {
+            <button 
+              type="button" 
+              class="btn-avatar-remove" 
+              (click)="onRemoveAvatar()" 
+              [disabled]="uploadingAvatar()"
+              title="Remove profile picture"
+            >
+              Remove
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-header-badge">
+      <span class="dw-badge" [ngClass]="verificationService.isCompleteDualVerified() ? 'dw-badge-success' : 'dw-badge-warning'">
+        <span class="dw-badge-dot"></span>
+        <span>{{ verificationService.isCompleteDualVerified() ? 'Dual-Anchor Verified' : 'Standard Protection' }}</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- 2. Profile Details Form (Editable Information) -->
+  <section class="dw-card dw-card-padded profile-form-card" aria-label="Editable User Information">
+    <div class="section-title-wrap">
+      <h2 class="dw-card-title">Personal &amp; Contact Information</h2>
+      <p class="dw-card-subtitle">
+        Update your personal details and how your name appears on trade agreements and delivery receipts.
+      </p>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" novalidate class="mt-3">
+      <div class="form-grid-2">
+        <div class="dw-form-group">
+          <label class="dw-label" for="prof-name">Full Legal Name *</label>
+          <input
+            type="text"
+            id="prof-name"
+            class="dw-input"
+            formControlName="full_name"
+            placeholder="e.g. Gabriel Otemu"
+          />
+          @if (profileForm.get('full_name')?.touched && profileForm.get('full_name')?.invalid) {
+            <span class="dw-field-error">Please enter your legal name.</span>
+          }
+        </div>
+
+        <div class="dw-form-group">
+          <label class="dw-label" for="prof-phone">Phone / WhatsApp *</label>
+          <input
+            type="tel"
+            id="prof-phone"
+            class="dw-input font-mono"
+            formControlName="phone"
+            placeholder="e.g. +234 801 234 5678"
+          />
+          @if (profileForm.get('phone')?.touched && profileForm.get('phone')?.invalid) {
+            <span class="dw-field-error">Please enter a valid phone number.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="dw-form-group">
+          <label class="dw-label" for="prof-email">Email Address</label>
+          <input
+            type="email"
+            id="prof-email"
+            class="dw-input"
+            formControlName="email"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="dw-form-group">
+          <label class="dw-label" for="prof-currency">Default Trade Currency *</label>
+          <select id="prof-currency" class="dw-select font-mono" formControlName="default_currency">
+            @for (c of currencies; track c.code) {
+              <option [value]="c.code">{{ c.code }} ({{ c.symbol }}) &mdash; {{ c.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="dw-form-group">
+        <label class="dw-label" for="prof-biz">Trade / Business Name (Optional)</label>
+        <input
+          type="text"
+          id="prof-biz"
+          class="dw-input"
+          formControlName="business_name"
+          placeholder="e.g. Gabriel Logistics, Otemu Trading"
+        />
+        <span class="dw-field-hint">Displayed to counterparties as your trading entity.</span>
+      </div>
+
+      <div class="dw-form-group">
+        <label class="dw-label" for="prof-addr">Primary Delivery / Handover Address (Optional)</label>
+        <textarea
+          id="prof-addr"
+          class="dw-textarea"
+          rows="2"
+          formControlName="address"
+          placeholder="e.g. 14 Marina Street, Lagos Island, Lagos"
+        ></textarea>
+      </div>
+
+      <div class="form-actions-bar">
+        <button type="submit" class="dw-btn dw-btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving Profile...' : 'Save Changes' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 3. Permanent Verification Anchors (Done Once & Locked) -->
+  <section class="dw-card dw-card-padded anchors-card" aria-label="Permanent Verification Anchors">
+    <div class="section-title-wrap">
+      <div class="anchors-head-row">
+        <h2 class="dw-card-title">Identity &amp; Settlement Anchors</h2>
+        <span class="anchors-badge">🛡️ Tamper-Proof</span>
+      </div>
+      <p class="dw-card-subtitle">
+        Completed once to secure your account. Subsequent verification must strictly match the database record.
+      </p>
+    </div>
+
+    <div class="anchors-grid">
+      <!-- Anchor 1: 3D Face Biometric Anchor -->
+      <div class="anchor-box">
+        <div class="anchor-top">
+          <span class="anchor-icon">📸</span>
+          <div>
+            <strong>3D Face Biometric Anchor</strong>
+            <span class="anchor-desc">Live facial liveness scan linked to your agreements</span>
+          </div>
+        </div>
+
+        @if (verificationService.isBiometricVerified()) {
+          <div class="anchor-status-pill locked">
+            <span class="status-icon">✓</span>
+            <span>Anchored &amp; Sealed (Locked)</span>
+          </div>
+          <span class="anchor-lock-note">
+            Face hash is cryptographically anchored. Any step-up identity check will verify against this baseline.
+          </span>
+        } @else {
+          <div class="anchor-status-pill pending">
+            <span>Action Required</span>
+          </div>
+          <a routerLink="/verification" [queryParams]="{ step: 1 }" class="dw-btn dw-btn-sm dw-btn-secondary mt-2">
+            Complete Face Scan &rarr;
+          </a>
+        }
+      </div>
+
+      <!-- Anchor 2: Settlement Bank Anchor -->
+      <div class="anchor-box">
+        <div class="anchor-top">
+          <span class="anchor-icon">🏦</span>
+          <div>
+            <strong>Payout Settlement Bank</strong>
+            <span class="anchor-desc">Verified NUBAN account for direct contract payouts</span>
+          </div>
+        </div>
+
+        @if (verificationService.isBankVerified()) {
+          <div class="anchor-status-pill locked">
+            <span class="status-icon">✓</span>
+            <span>
+              {{ authService.activeBusiness()?.bank_name || 'Settlement Bank' }} &bull; 
+              {{ authService.activeBusiness()?.verified_account_number ? '••••' + authService.activeBusiness()?.verified_account_number?.slice(-4) : 'Verified (Locked)' }}
+            </span>
+          </div>
+          <span class="anchor-lock-note">
+            Settlement payouts are locked to this bank account to prevent diversion fraud.
+          </span>
+        } @else {
+          <div class="anchor-status-pill pending">
+            <span>Action Required</span>
+          </div>
+          <a routerLink="/verification" [queryParams]="{ step: 2 }" class="dw-btn dw-btn-sm dw-btn-secondary mt-2">
+            Link Settlement Bank &rarr;
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+</div>

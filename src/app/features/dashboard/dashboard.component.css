@@ -1,0 +1,1138 @@
+/* ==========================================================================
+   Digital Watchdog — Overview Page (dashboard.component.css)
+   ========================================================================== */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.overview-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.overview-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.overview-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Needs Attention Queue */
+.attention-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.attention-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background-color var(--dw-transition-fast);
+}
+
+.attention-row:last-child {
+  border-bottom: none;
+}
+
+.attention-row:hover {
+  background: var(--bg-elevated);
+}
+
+.att-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.att-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.att-partner {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.att-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Ledger Row Cells */
+.cell-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.row-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.role-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.text-right {
+  text-align: right;
+}
+
+.overview-loading {
+  padding: 48px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* Right Sidebar Cards */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.side-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.side-panel-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.verify-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.verify-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-canvas);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color var(--dw-transition-fast);
+}
+
+.verify-check-item:hover {
+  border-color: var(--border-strong);
+}
+
+.check-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.check-dot.done {
+  background: var(--status-success-bg);
+  border-color: var(--status-success-border);
+  color: var(--status-success);
+}
+
+.check-texts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.check-texts strong {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.check-texts span {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.check-arrow {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.quick-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quick-steps-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8125rem;
+}
+
+.quick-steps-list strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.quick-steps-list span {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+  .overview-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .dw-ledger-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "main amount"
+      "ref status";
+    gap: 6px 12px;
+  }
+  .cell-main { grid-area: main; }
+  .cell-amount { grid-area: amount; text-align: right; }
+  .cell-ref { grid-area: ref; }
+  .cell-status { grid-area: status; display: flex; justify-content: flex-end; }
+  .cell-role,
+  .cell-arrow {
+    display: none;
+  }
+  .attention-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .att-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Keep mobile Overview focused: hide secondary "All Deals" header button (Deals is in bottom nav)
+     and hide the 3-step tutorial card on mobile so users see their active deals immediately */
+  .header-actions a.dw-btn-secondary {
+    display: none;
+  }
+  .side-panel:last-child {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   HorizonX Inspired UI/UX Architecture
+   Inspirations: https://horizonx.so/explore (Goals Finance App, Verve, Bank App)
+   ========================================================================== */
+
+/* 1. HorizonX Personalized Top Header Bar */
+.hx-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.hx-header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hx-user-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.hx-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hx-greeting-sub {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-primary, #40A8D8);
+}
+
+.hx-greeting-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.hx-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hx-verif-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--status-info-bg);
+  color: var(--status-info);
+  border: 1px solid var(--status-info-border);
+}
+
+.hx-verif-pill.verified {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+/* 2. HorizonX Obsidian Protected Volume Hero Card */
+.hx-obsidian-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 26px 28px;
+  margin-bottom: 22px;
+  background: radial-gradient(120% 120% at 85% 10%, rgba(64, 168, 216, 0.22) 0%, rgba(8, 19, 32, 0.98) 65%), #0A131F;
+  border: 1px solid rgba(64, 168, 216, 0.24);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .hx-obsidian-hero,
+.theme-light .hx-obsidian-hero {
+  background: radial-gradient(120% 120% at 85% 10%, rgba(64, 168, 216, 0.18) 0%, #0D2238 65%), #0D2238;
+  color: #FFFFFF;
+}
+
+.hx-hero-ambient-glow {
+  position: absolute;
+  right: -50px;
+  top: -50px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(64, 168, 216, 0.28) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(30px);
+}
+
+.hx-hero-top-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.hx-chip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #E2E8F0;
+  letter-spacing: 0.02em;
+}
+
+.hx-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #40A8D8;
+  box-shadow: 0 0 8px #40A8D8;
+}
+
+.hx-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #34D399;
+}
+
+.hx-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+  animation: hx-pulse 2s infinite ease-in-out;
+}
+
+@keyframes hx-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.hx-hero-volume-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 26px;
+}
+
+.hx-volume-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+}
+
+.hx-volume-value {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hx-volume-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  font-size: 0.8125rem;
+  color: #CBD5E1;
+  margin-top: 4px;
+}
+
+.hx-bullet {
+  opacity: 0.5;
+}
+
+/* 2 Circular Action Buttons inside Hero (Centered & Intentional) */
+.hx-hero-actions-rail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+}
+
+.hx-action-circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #F1F5F9;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
+}
+
+.hx-action-circle-item:hover {
+  transform: translateY(-2px);
+}
+
+.hx-action-circle-item:active {
+  transform: scale(0.94);
+}
+
+.hx-circle-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.hx-action-circle-item:hover .hx-circle-btn {
+  background: rgba(64, 168, 216, 0.25);
+  border-color: rgba(64, 168, 216, 0.5);
+  box-shadow: 0 6px 18px rgba(64, 168, 216, 0.35);
+  color: #40A8D8;
+}
+
+.hx-circle-btn.hx-btn-primary {
+  background: linear-gradient(135deg, #40A8D8 0%, #1A73E8 100%);
+  border-color: rgba(64, 168, 216, 0.6);
+  box-shadow: 0 6px 20px rgba(64, 168, 216, 0.45);
+  color: #FFFFFF;
+}
+
+.hx-action-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #E2E8F0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 3. HorizonX Trading Partners Avatar Rail (Quick Contacts) */
+.hx-partners-section {
+  margin-bottom: 22px;
+}
+
+.hx-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.hx-sec-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hx-sec-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.hx-sec-badge {
+  font-size: 0.6875rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.hx-sec-link {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.hx-partners-rail-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hx-partners-rail-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.hx-partner-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  width: 62px;
+  transition: transform 0.15s ease;
+}
+
+.hx-partner-item:hover {
+  transform: translateY(-2px);
+}
+
+.hx-partner-avatar-dashed {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  transition: all 0.2s ease;
+}
+
+.hx-partner-item:hover .hx-partner-avatar-dashed {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--accent-subtle);
+}
+
+.hx-partner-avatar-wrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+}
+
+.hx-partner-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.hx-partner-tick {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #059669;
+  color: #FFFFFF;
+  font-size: 0.625rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-surface, #0A131F);
+}
+
+.hx-partner-name {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 62px;
+}
+
+/* 4. HorizonX KPI Metric Pills */
+.hx-kpi-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.hx-kpi-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.hx-kpi-arrow {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  transition: transform 0.2s ease;
+}
+
+.hx-kpi-pill:hover .hx-kpi-arrow {
+  transform: translateX(3px);
+  color: var(--accent-primary);
+}
+
+.hx-kpi-pill:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+  transform: translateY(-1px);
+}
+
+.hx-kpi-pill.active {
+  border-color: var(--accent-primary);
+  background: var(--accent-subtle);
+}
+
+.hx-kpi-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-active {
+  background: #40A8D8;
+  box-shadow: 0 0 6px #40A8D8;
+}
+
+.dot-pending {
+  background: #F59E0B;
+  box-shadow: 0 0 6px #F59E0B;
+}
+
+.dot-completed {
+  background: #10B981;
+  box-shadow: 0 0 6px #10B981;
+}
+
+.dot-all {
+  background: #8B5CF6;
+  box-shadow: 0 0 6px #8B5CF6;
+}
+
+.hx-kpi-lbl {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* 5. HorizonX Mobile Deal Cards (Inspirations: goals-finance-app) */
+.hx-mobile-deal-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0 6px;
+}
+
+.hx-deal-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hx-deal-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.hx-dc-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.hx-dc-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.hx-dc-title-group {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hx-dc-ref-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hx-dc-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hx-dc-partner {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.hx-dc-amount-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.hx-dc-amount {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Milestone Progress Bar */
+.hx-dc-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hx-dc-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.hx-dc-step-label {
+  font-weight: 500;
+}
+
+.hx-dc-step-pct {
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.hx-dc-progress-track {
+  height: 5px;
+  width: 100%;
+  border-radius: 9999px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.hx-dc-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #40A8D8 0%, #10B981 100%);
+  transition: width 0.4s ease;
+}
+
+/* Table Progress Bar (Desktop) */
+.cell-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hx-table-progress-bar {
+  width: 80px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.hx-table-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #40A8D8 0%, #10B981 100%);
+}
+
+/* Dual-Anchor Protection Gateway Card */
+.hx-protection-gateway-card {
+  margin-top: 10px;
+}
+
+.hx-gateway-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.hx-gateway-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hx-gateway-badge-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.hx-gateway-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.hx-gateway-tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hx-gateway-tile:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.hx-gt-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.hx-gt-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hx-gt-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hx-gt-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #D97706;
+}
+
+.hx-gt-status.is-verified {
+  color: #10B981;
+}
+
+.hx-gt-sub {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.hx-gt-arrow {
+  color: var(--text-muted);
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.hx-gateway-tile:hover .hx-gt-arrow {
+  transform: translateX(4px);
+  color: var(--accent-primary);
+}
+
+@media (min-width: 769px) {
+  .hx-mobile-deal-cards {
+    display: none !important;
+  }
+  .hx-desktop-ledger {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Mobile Responsive Overrides (< 768px)
+   Placed at bottom to guarantee correct cascade precedence
+   ========================================================================== */
+@media (max-width: 768px) {
+  .hx-page-header {
+    display: none !important;
+  }
+  .hx-desktop-ledger {
+    display: none !important;
+  }
+  .hx-desktop-new-btn {
+    display: none !important;
+  }
+  .hx-mobile-deal-cards {
+    display: none !important;
+  }
+  .hx-obsidian-hero {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+  .hx-hero-top-strip {
+    gap: 8px 12px;
+  }
+  .hx-volume-value {
+    font-size: 1.85rem;
+  }
+  .hx-circle-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .hx-kpi-summary-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .hx-kpi-pill {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    min-width: 0;
+  }
+  .hx-kpi-lbl {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hx-protection-gateway-card {
+    padding: 16px 14px !important;
+    border-radius: 18px;
+  }
+  .hx-gateway-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .hx-view-ledger-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .hx-gateway-tiles-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .hx-gateway-tile {
+    padding: 14px 16px !important;
+    gap: 12px !important;
+    border-radius: 14px;
+  }
+  .hx-gt-icon-box {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.15rem !important;
+  }
+  .hx-gt-info {
+    min-width: 0 !important;
+  }
+  .hx-gt-title {
+    font-size: 0.85rem !important;
+    line-height: 1.25;
+  }
+  .hx-gt-status {
+    font-size: 0.72rem !important;
+    margin-top: 2px;
+  }
+  .hx-gt-sub {
+    font-size: 0.7rem !important;
+    line-height: 1.35;
+    margin-top: 2px;
+  }
+  .hx-gt-arrow {
+    font-size: 1rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hx-hero-top-strip {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+}
