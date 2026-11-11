@@ -8,6 +8,7 @@ import { ThemeService } from '../core/services/theme.service';
 import { VerificationService } from '../core/services/verification.service';
 import { DealService } from '../core/services/deal.service';
 import { TierWarningModalComponent } from '../shared/components/tier-warning-modal/tier-warning-modal.component';
+import { environment } from '../../environments/environment';
 import { filter } from 'rxjs';
 
 @Component({
@@ -31,6 +32,7 @@ export class MainLayoutComponent implements OnInit {
   verificationService = inject(VerificationService);
   dealService = inject(DealService);
   private router = inject(Router);
+  readonly websiteUrl = environment.websiteUrl;
 
   sidebarCollapsed = signal(false);
   mobileMenuOpen = signal(false);

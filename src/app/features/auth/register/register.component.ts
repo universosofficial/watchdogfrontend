@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { environment } from '../../../../environments/environment';
 
 interface CountryOption {
   code: string;
@@ -28,6 +29,7 @@ export class RegisterComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private notificationService = inject(NotificationService);
   themeService = inject(ThemeService);
+  readonly websiteUrl = environment.websiteUrl;
 
   countries: CountryOption[] = [
     { code: 'NG', dialCode: '+234', name: 'Nigeria', flag: '🇳🇬', currency: 'NGN' },
