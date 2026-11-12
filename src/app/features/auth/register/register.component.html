@@ -63,13 +63,6 @@
 
     <div class="auth-card-wrap">
 
-      <!-- Step Indicator -->
-      <div class="reg-steps-row">
-        <span class="reg-step-pill" [class.active]="registrationStep() === 1">1. Your Details</span>
-        <span class="text-xs text-muted">&rarr;</span>
-        <span class="reg-step-pill" [class.active]="registrationStep() === 2">2. Verify Phone</span>
-      </div>
-
       <!-- STEP 1: ACCOUNT DETAILS -->
       @if (registrationStep() === 1) {
         <div class="auth-header">
@@ -206,9 +199,9 @@
           <button type="submit" class="dw-btn dw-btn-primary dw-btn-lg w-100" [disabled]="loading()">
             @if (loading()) {
               <span class="spinner"></span>
-              <span>Sending verification code...</span>
+              <span>Creating your account...</span>
             } @else {
-              <span>Continue &rarr;</span>
+              <span>Create Account &rarr;</span>
             }
           </button>
         </form>

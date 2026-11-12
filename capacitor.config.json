@@ -1,0 +1,8 @@
+{
+  "appId": "com.univasos.watchdog",
+  "appName": "Watchdog",
+  "webDir": "dist/frontend/browser",
+  "server": {
+    "androidScheme": "https"
+  }
+}

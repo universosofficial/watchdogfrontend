@@ -147,20 +147,40 @@ export class RegisterComponent implements OnDestroy {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    const fullPhone = this.getFullPhoneNumber(this.step1Form.value.phone);
+    const step1Val = this.step1Form.value;
+    const fullPhone = this.getFullPhoneNumber(step1Val.phone);
     this.formattedPhone.set(fullPhone);
 
-    this.authService.requestOtp(fullPhone, 'registration').subscribe({
+    const isInd = this.accountType() === 'individual';
+    const country = this.selectedCountry();
+
+    const payload = {
+      phone: fullPhone,
+      otp: '000000',
+      full_name: step1Val.full_name.trim(),
+      password: step1Val.password,
+      country_code: country.code,
+      default_currency: country.currency,
+      active_persona: this.activePersona(),
+      account_type: this.accountType(),
+      terms_accepted: !!step1Val.terms_accepted,
+      business_name: isInd
+        ? (step1Val.business_name?.trim() || `${step1Val.full_name.trim()} (Trading)`)
+        : step1Val.business_name?.trim()
+    };
+
+    this.authService.registerPhone(payload).subscribe({
       next: () => {
         this.loading.set(false);
-        this.registrationStep.set(2);
-        this.otpForm.reset();
-        this.startCountdown();
-        this.notificationService.showSuccess(`Verification code sent to ${fullPhone}`);
+        this.notificationService.showSuccess(
+          'Account created successfully! Welcome to Digital Watchdog.'
+        );
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(err.error?.error?.message || err.error?.message || 'Failed to dispatch SMS verification code.');
+        this.errorMessage.set(err.error?.error?.message || err.error?.message || err.message || 'Registration failed');
       }
     });
   }
@@ -216,11 +236,15 @@ export class RegisterComponent implements OnDestroy {
     this.errorMessage.set(null);
 
     this.authService.requestOtp(this.formattedPhone(), 'registration').subscribe({
-      next: () => {
+      next: (res: any) => {
         this.loading.set(false);
         this.otpForm.reset();
+        if (res?.data?.debug_otp) {
+          this.otpForm.patchValue({ otp: res.data.debug_otp });
+        }
         this.startCountdown();
-        this.notificationService.showSuccess(`New code sent to ${this.formattedPhone()}`);
+        const hint = res?.data?.debug_otp ? ` (Test code: ${res.data.debug_otp})` : '';
+        this.notificationService.showSuccess(`New code sent to ${this.formattedPhone()}${hint}`);
       },
       error: (err) => {
         this.loading.set(false);

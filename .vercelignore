@@ -1,0 +1,7 @@
+android
+ios
+.gradle
+.angular
+dist
+node_modules
+*.apk

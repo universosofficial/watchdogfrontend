@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Watchdog</string>
+    <string name="title_activity_main">Watchdog</string>
+    <string name="package_name">com.univasos.watchdog</string>
+    <string name="custom_url_scheme">com.univasos.watchdog</string>
+</resources>
