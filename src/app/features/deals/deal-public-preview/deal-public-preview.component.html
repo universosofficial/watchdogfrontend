@@ -101,14 +101,14 @@
           </div>
         </div>
 
-        <!-- Core USP: Item Photos -->
-        @if (data.evidence && data.evidence.length > 0) {
-          <section class="prepayment-photos-section">
+        <!-- Item Photos Section -->
+        <section class="prepayment-photos-section">
+          @if (data.evidence && data.evidence.length > 0) {
             <div class="section-title-row">
               <div>
                 <h2 class="sub-heading">📸 Item Photos</h2>
                 <p class="sub-sub">
-                  The seller uploaded these {{ data.evidence.length }} photo{{ data.evidence.length > 1 ? 's' : '' }} before payment. Check these closely before agreeing.
+                  Photos uploaded for this deal. Check these closely before agreeing.
                 </p>
               </div>
               <span class="ledger-pill">Photos Saved</span>
@@ -125,8 +125,17 @@
                 </div>
               }
             </div>
-          </section>
-        }
+          } @else {
+            <div class="section-title-row">
+              <div>
+                <h2 class="sub-heading">📸 Item Photos</h2>
+                <p class="sub-sub">
+                  No photos uploaded yet. Photos will be uploaded by the seller before payment.
+                </p>
+              </div>
+            </div>
+          }
+        </section>
 
         <!-- Terms & Agreement -->
         <section class="terms-section">

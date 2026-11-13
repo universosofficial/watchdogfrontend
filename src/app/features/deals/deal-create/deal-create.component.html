@@ -105,131 +105,144 @@
 
       <hr class="form-divider" />
 
-      <!-- STEP 2: Item Photos -->
-      <section class="form-step-block">
-        <div class="step-badge-row">
-          <span class="step-num-pill">2</span>
-          <div class="step-title-group">
-            <h2 class="step-title">Item Photos</h2>
-          </div>
-        </div>
-        <p class="step-desc">
-          Upload photos so both parties agree on the item's condition before payment.
-        </p>
-
-        <!-- Photo Upload Dropzone / Gallery -->
-        <div class="photos-upload-container">
-          @if (itemPhotos().length > 0) {
-            <div class="photo-thumbnails-grid">
-              @for (photo of itemPhotos(); track photo.name; let idx = $index) {
-                <div class="photo-thumb-card">
-                  <img [src]="photo.previewUrl" [alt]="photo.name" class="photo-thumb-img" />
-                  <button
-                    type="button"
-                    class="photo-thumb-remove"
-                    (click)="removePhoto(idx)"
-                    title="Remove photo"
-                    aria-label="Remove photo"
-                  >
-                    &times;
-                  </button>
-                  <span class="photo-thumb-badge">Photo #{{ idx + 1 }}</span>
-                </div>
-              }
-              @if (itemPhotos().length < 8) {
-                <label class="photo-add-card" for="item-photos-input">
-                  <span class="photo-add-icon">+</span>
-                  <span class="photo-add-text">Add More</span>
-                </label>
-              }
+      @if (initiatorRole() === 'seller') {
+        <!-- STEP 2: Item Photos (Sellers Only) -->
+        <section class="form-step-block">
+          <div class="step-badge-row">
+            <span class="step-num-pill">2</span>
+            <div class="step-title-group">
+              <h2 class="step-title">Item Photos</h2>
             </div>
-          } @else {
-            <label class="photo-dropzone" for="item-photos-input">
-              <div class="dropzone-icon-box">📸</div>
-              <div class="dropzone-text-group">
-                <strong>Upload photos (up to 8)</strong>
-                <span>Take clear photos of the item from different angles.</span>
-              </div>
-              <span class="dw-btn dw-btn-sm dw-btn-secondary">Upload Photos</span>
-            </label>
-          }
+          </div>
+          <p class="step-desc">
+            Upload photos so both parties agree on the item's condition before payment.
+          </p>
 
-          <input
-            type="file"
-            id="item-photos-input"
-            class="sr-only"
-            accept="image/*"
-            multiple
-            (change)="onPhotosSelected($event)"
-          />
-        </div>
-
-        <!-- Progressive Disclosure: Serial Number, IMEI & Flaws -->
-        <div class="progressive-disclosure-wrap">
-          <button
-            type="button"
-            class="progressive-toggle-btn"
-            (click)="toggleDetailedFlaws()"
-          >
-            <span>{{ showDetailedFlawsAndSerial() ? '− Hide Details' : '+ Add Serial Number or Flaws (Optional)' }}</span>
-          </button>
-
-          @if (showDetailedFlawsAndSerial() || serialNumber() || disclosedFlaws() || selectedAccessories().length > 0) {
-            <div class="progressive-box dw-reveal-scale">
-              <div class="dw-form-group">
-                <label class="dw-label" for="deal-serial">Serial / IMEI / Model Number</label>
-                <input
-                  type="text"
-                  id="deal-serial"
-                  class="dw-input font-mono"
-                  [value]="serialNumber()"
-                  (input)="serialNumber.set($any($event.target).value)"
-                  placeholder="e.g. Serial: F17LK0..., IMEI: 354928110928371, or Model No."
-                />
-                <span class="dw-field-hint">Helps confirm the exact item at delivery.</span>
-              </div>
-
-              <div class="dw-form-group">
-                <label class="dw-label" for="deal-flaws">Any Known Scratches or Flaws</label>
-                <input
-                  type="text"
-                  id="deal-flaws"
-                  class="dw-input"
-                  [value]="disclosedFlaws()"
-                  (input)="disclosedFlaws.set($any($event.target).value)"
-                  placeholder="e.g. Minor hairline scratch on corner; battery health 92%"
-                />
-                <span class="dw-field-hint">Noting flaws upfront prevents misunderstandings later.</span>
-              </div>
-
-              <div class="dw-form-group">
-                <label class="dw-label">Included Accessories</label>
-                <div class="accessory-chips-grid">
-                  @for (acc of availableAccessories; track acc) {
+          <!-- Photo Upload Dropzone / Gallery -->
+          <div class="photos-upload-container">
+            @if (itemPhotos().length > 0) {
+              <div class="photo-thumbnails-grid">
+                @for (photo of itemPhotos(); track photo.name; let idx = $index) {
+                  <div class="photo-thumb-card">
+                    <img [src]="photo.previewUrl" [alt]="photo.name" class="photo-thumb-img" />
                     <button
                       type="button"
-                      class="accessory-chip"
-                      [class.selected]="selectedAccessories().includes(acc)"
-                      (click)="toggleAccessory(acc)"
+                      class="photo-thumb-remove"
+                      (click)="removePhoto(idx)"
+                      title="Remove photo"
+                      aria-label="Remove photo"
                     >
-                      <span class="chip-check">{{ selectedAccessories().includes(acc) ? '✓' : '+' }}</span>
-                      <span>{{ acc }}</span>
+                      &times;
                     </button>
-                  }
+                    <span class="photo-thumb-badge">Photo #{{ idx + 1 }}</span>
+                  </div>
+                }
+                @if (itemPhotos().length < 8) {
+                  <label class="photo-add-card" for="item-photos-input">
+                    <span class="photo-add-icon">+</span>
+                    <span class="photo-add-text">Add More</span>
+                  </label>
+                }
+              </div>
+            } @else {
+              <label class="photo-dropzone" for="item-photos-input">
+                <div class="dropzone-icon-box">📸</div>
+                <div class="dropzone-text-group">
+                  <strong>Upload photos (up to 8)</strong>
+                  <span>Take clear photos of the item from different angles.</span>
+                </div>
+                <span class="dw-btn dw-btn-sm dw-btn-secondary">Upload Photos</span>
+              </label>
+            }
+
+            <input
+              type="file"
+              id="item-photos-input"
+              class="sr-only"
+              accept="image/*"
+              multiple
+              (change)="onPhotosSelected($event)"
+            />
+          </div>
+
+          <!-- Progressive Disclosure: Serial Number, IMEI & Flaws -->
+          <div class="progressive-disclosure-wrap">
+            <button
+              type="button"
+              class="progressive-toggle-btn"
+              (click)="toggleDetailedFlaws()"
+            >
+              <span>{{ showDetailedFlawsAndSerial() ? '− Hide Details' : '+ Add Serial Number or Flaws (Optional)' }}</span>
+            </button>
+
+            @if (showDetailedFlawsAndSerial() || serialNumber() || disclosedFlaws() || selectedAccessories().length > 0) {
+              <div class="progressive-box dw-reveal-scale">
+                <div class="dw-form-group">
+                  <label class="dw-label" for="deal-serial">Serial / IMEI / Model Number</label>
+                  <input
+                    type="text"
+                    id="deal-serial"
+                    class="dw-input font-mono"
+                    [value]="serialNumber()"
+                    (input)="serialNumber.set($any($event.target).value)"
+                    placeholder="e.g. Serial: F17LK0..., IMEI: 354928110928371, or Model No."
+                  />
+                  <span class="dw-field-hint">Helps confirm the exact item at delivery.</span>
+                </div>
+
+                <div class="dw-form-group">
+                  <label class="dw-label" for="deal-flaws">Any Known Scratches or Flaws</label>
+                  <input
+                    type="text"
+                    id="deal-flaws"
+                    class="dw-input"
+                    [value]="disclosedFlaws()"
+                    (input)="disclosedFlaws.set($any($event.target).value)"
+                    placeholder="e.g. Minor hairline scratch on corner; battery health 92%"
+                  />
+                  <span class="dw-field-hint">Noting flaws upfront prevents misunderstandings later.</span>
+                </div>
+
+                <div class="dw-form-group">
+                  <label class="dw-label">Included Accessories</label>
+                  <div class="accessory-chips-grid">
+                    @for (acc of availableAccessories; track acc) {
+                      <button
+                        type="button"
+                        class="accessory-chip"
+                        [class.selected]="selectedAccessories().includes(acc)"
+                        (click)="toggleAccessory(acc)"
+                      >
+                        <span class="chip-check">{{ selectedAccessories().includes(acc) ? '✓' : '+' }}</span>
+                        <span>{{ acc }}</span>
+                      </button>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
-          }
+            }
+          </div>
+        </section>
+
+        <hr class="form-divider" />
+      } @else {
+        <!-- Note for Buyer: Seller will provide photos -->
+        <div class="buyer-photos-info-callout">
+          <div class="bpi-icon">📸</div>
+          <div class="bpi-text">
+            <strong>Photos will be provided by the seller</strong>
+            <span>As a buyer, you don't need to upload photos. The seller will upload photos of the item so you can review its condition before payment.</span>
+          </div>
         </div>
-      </section>
 
-      <hr class="form-divider" />
+        <hr class="form-divider" />
+      }
 
-      <!-- STEP 3: Trading Partner -->
+      <!-- STEP: Trading Partner -->
       <section class="form-step-block">
         <div class="step-badge-row">
-          <span class="step-num-pill">3</span>
-          <h2 class="step-title">Trading Partner</h2>
+          <span class="step-num-pill">{{ initiatorRole() === 'seller' ? '3' : '2' }}</span>
+          <h2 class="step-title">{{ initiatorRole() === 'seller' ? "Buyer's Contact" : "Seller's Contact" }}</h2>
         </div>
 
         <div class="form-row-2">
@@ -346,41 +359,51 @@
           </strong>
         </div>
 
-        @if (itemPhotos().length > 0 || serialNumber() || disclosedFlaws() || selectedAccessories().length > 0) {
-          <div class="preview-locked-specs-box">
-            <div class="pls-badge">
-              <span>📷 ITEM DETAILS & PHOTOS</span>
+        @if (initiatorRole() === 'seller') {
+          @if (itemPhotos().length > 0 || serialNumber() || disclosedFlaws() || selectedAccessories().length > 0) {
+            <div class="preview-locked-specs-box">
+              <div class="pls-badge">
+                <span>📷 ITEM DETAILS & PHOTOS</span>
+              </div>
+
+              @if (itemPhotos().length > 0) {
+                <div class="pls-photos-strip">
+                  @for (photo of itemPhotos(); track photo.name) {
+                    <img [src]="photo.previewUrl" [alt]="photo.name" class="pls-photo-thumb" />
+                  }
+                </div>
+                <span class="pls-photo-count">{{ itemPhotos().length }} photo{{ itemPhotos().length > 1 ? 's' : '' }} ready</span>
+              }
+
+              @if (serialNumber()) {
+                <div class="pls-row">
+                  <span class="pls-lbl">Serial / IMEI:</span>
+                  <span class="pls-val font-mono">{{ serialNumber() }}</span>
+                </div>
+              }
+
+              @if (disclosedFlaws()) {
+                <div class="pls-row">
+                  <span class="pls-lbl">Disclosed Flaws:</span>
+                  <span class="pls-val">{{ disclosedFlaws() }}</span>
+                </div>
+              }
+
+              @if (selectedAccessories().length > 0) {
+                <div class="pls-row">
+                  <span class="pls-lbl">Accessories:</span>
+                  <span class="pls-val">{{ selectedAccessories().join(', ') }}</span>
+                </div>
+              }
             </div>
-
-            @if (itemPhotos().length > 0) {
-              <div class="pls-photos-strip">
-                @for (photo of itemPhotos(); track photo.name) {
-                  <img [src]="photo.previewUrl" [alt]="photo.name" class="pls-photo-thumb" />
-                }
-              </div>
-              <span class="pls-photo-count">{{ itemPhotos().length }} photo{{ itemPhotos().length > 1 ? 's' : '' }} ready</span>
-            }
-
-            @if (serialNumber()) {
-              <div class="pls-row">
-                <span class="pls-lbl">Serial / IMEI:</span>
-                <span class="pls-val font-mono">{{ serialNumber() }}</span>
-              </div>
-            }
-
-            @if (disclosedFlaws()) {
-              <div class="pls-row">
-                <span class="pls-lbl">Disclosed Flaws:</span>
-                <span class="pls-val">{{ disclosedFlaws() }}</span>
-              </div>
-            }
-
-            @if (selectedAccessories().length > 0) {
-              <div class="pls-row">
-                <span class="pls-lbl">Accessories:</span>
-                <span class="pls-val">{{ selectedAccessories().join(', ') }}</span>
-              </div>
-            }
+          }
+        } @else {
+          <div class="preview-buyer-photos-card">
+            <span class="preview-buyer-icon">📷</span>
+            <div class="preview-buyer-text">
+              <strong>Item Photos</strong>
+              <span>Seller will upload photos before you pay.</span>
+            </div>
           </div>
         }
 

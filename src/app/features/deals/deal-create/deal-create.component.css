@@ -789,3 +789,69 @@
   color: var(--text-primary);
   word-break: break-word;
 }
+
+/* Buyer Photos Notice Callouts */
+.buyer-photos-info-callout {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-md, 12px);
+  margin-bottom: 8px;
+}
+
+.bpi-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.bpi-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bpi-text strong {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.bpi-text span {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.preview-buyer-photos-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 8px;
+}
+
+.preview-buyer-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.preview-buyer-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-buyer-text strong {
+  font-size: 0.75rem;
+  color: var(--text-primary);
+}
+
+.preview-buyer-text span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+

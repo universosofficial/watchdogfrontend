@@ -279,8 +279,8 @@ export class DealCreateComponent implements OnInit {
 
       if (val.currency === 'NGN' && amount > max) {
         this.verificationService.openWarningModal({
-          title: 'Contract Exceeds Tier Limit',
-          message: `This deal value (₦${amount.toLocaleString()}) exceeds your current ${tier.toUpperCase()} limit (₦${max.toLocaleString()}). Anchor your settlement bank account or complete 3D facial verification to unlock higher contract limits.`,
+          title: 'Deal Exceeds Account Limit',
+          message: `This deal value (₦${amount.toLocaleString()}) exceeds your current ${tier.toUpperCase()} limit (₦${max.toLocaleString()}). Complete your bank or face verification to unlock higher deal limits.`,
           currentTier: tier,
           requiredTier: amount > 5000000 ? 'tier_3' : 'tier_2'
         });
@@ -289,7 +289,7 @@ export class DealCreateComponent implements OnInit {
     }
 
     this.loading.set(true);
-    this.statusFeedback.set('Registering deal on ledger...');
+    this.statusFeedback.set('Creating deal...');
     this.errorMessage.set(null);
 
     // Build tamper-proof terms with locked condition details
@@ -331,12 +331,12 @@ export class DealCreateComponent implements OnInit {
 
         if (photosToUpload.length === 0) {
           this.loading.set(false);
-          this.notificationService.showSuccess(`Deal created successfully & dispatched to ${recipient}! Ref: ${created.reference_no}`);
+          this.notificationService.showSuccess(`Deal created! Share the link with the ${recipient.toLowerCase()}. Ref: ${created.reference_no}`);
           this.router.navigate(['/deals', created.id]);
           return;
         }
 
-        this.statusFeedback.set(`Sealing ${photosToUpload.length} baseline photos to evidence ledger...`);
+        this.statusFeedback.set(`Uploading ${photosToUpload.length} photos...`);
 
         // Upload baseline photos sequentially/in-parallel to evidence ledger
         const uploadObservables = photosToUpload.map((p, idx) => {

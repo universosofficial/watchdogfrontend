@@ -349,34 +349,18 @@ export class DealWorkspaceComponent implements OnInit, OnDestroy {
     if (this.authService.isSeller() && !this.verificationService.isVerified()) {
       this.verificationService.openWarningModal({
         title: 'Seller Verification Required',
-        message: 'Before accepting contracts, please anchor your settlement bank account or complete 3D facial verification in the Verification Center.',
+        message: 'Before accepting deals, please complete identity verification in the Verification Center.',
         currentTier: this.verificationService.activeTier(),
         requiredTier: 'tier_2'
       });
       return;
     }
 
-    const details = this.activeDealDetails();
-    const amount = details?.deal?.amount || 0;
-
-    this.requestStepUpAuthorization({
-      type: 'accept_deal',
-      dealId,
-      amount,
-      title: `Accept & Digitally Sign Deal: ${this.cleanTitle(details?.deal?.title || '')} (${this.formatMoney(amount, details?.deal?.currency || 'NGN')})`
-    });
+    this.executeAcceptDeal(dealId);
   }
 
   onSimulateAccept(dealId: string): void {
-    const details = this.activeDealDetails();
-    const amount = details?.deal?.amount || 0;
-
-    this.requestStepUpAuthorization({
-      type: 'accept_deal',
-      dealId,
-      amount,
-      title: `Digitally Sign & Accept Deal (${this.formatMoney(amount, details?.deal?.currency || 'NGN')})`
-    });
+    this.executeAcceptDeal(dealId);
   }
 
   executeAcceptDeal(dealId: string): void {
@@ -387,7 +371,7 @@ export class DealWorkspaceComponent implements OnInit, OnDestroy {
 
     service$.subscribe({
       next: () => {
-        this.notificationService.showSuccess('Agreement digitally accepted! Contract is now active and protected.');
+        this.notificationService.showSuccess('Agreement digitally accepted! Deal is now active and protected.');
         this.loadDealContext(dealId);
       },
       error: (err: any) => {
@@ -409,22 +393,49 @@ export class DealWorkspaceComponent implements OnInit, OnDestroy {
 
   // --- Payment Execution ---
   onConfirmPayment(dealId: string, paymentId: string): void {
-    const details = this.activeDealDetails();
-    const paymentItem = this.feedItems().find(f => f.payment?.id === paymentId);
-    const amount = paymentItem?.payment?.reported_amount || details?.deal?.amount || 0;
-
-    if (amount >= this.HIGH_VALUE_THRESHOLD) {
-      this.requestStepUpAuthorization({
-        type: 'confirm_payment',
-        dealId,
-        paymentId,
-        amount,
-        title: `Confirm Payment Receipt (${this.formatMoney(amount, details?.deal?.currency || 'NGN')})`
-      });
-      return;
-    }
-
     this.executeConfirmedPayment(dealId, paymentId);
+  }
+
+  // --- Seller Item Photos Upload (When deal created by buyer) ---
+  uploadingItemPhotos = signal(false);
+
+  onSellerUploadPhotos(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const dealId = this.activeDealDetails()?.deal?.id;
+    if (!dealId) return;
+
+    const files = Array.from(input.files);
+    this.uploadingItemPhotos.set(true);
+
+    let completed = 0;
+    files.forEach((file, idx) => {
+      const fd = new FormData();
+      fd.append('file', file, file.name);
+      fd.append('notes', `Item Condition Photo #${idx + 1} (${file.name})`);
+
+      this.dealService.uploadEvidence(dealId, fd).subscribe({
+        next: () => {
+          completed++;
+          if (completed === files.length) {
+            this.uploadingItemPhotos.set(false);
+            this.notificationService.showSuccess(`✓ ${completed} photo(s) uploaded successfully!`);
+            this.loadDealContext(dealId);
+          }
+        },
+        error: (err) => {
+          console.warn('Failed uploading photo:', err);
+          completed++;
+          if (completed === files.length) {
+            this.uploadingItemPhotos.set(false);
+            this.loadDealContext(dealId);
+          }
+        }
+      });
+    });
+
+    input.value = '';
   }
 
   executeConfirmedPayment(dealId: string, paymentId: string): void {

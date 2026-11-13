@@ -72,6 +72,46 @@
 }
 
 /* 2. 4-Step Lifecycle Progress Bar */
+.seller-photo-prompt-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--bg-surface);
+  border: 1px dashed var(--accent-primary, #40A8D8);
+  border-radius: var(--radius-md, 12px);
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+}
+
+.spp-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.spp-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.spp-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 3px 0;
+}
+
+.spp-sub {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
 .lifecycle-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
