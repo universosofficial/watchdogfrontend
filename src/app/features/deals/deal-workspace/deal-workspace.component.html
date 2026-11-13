@@ -151,32 +151,32 @@
       </div>
     }
 
-    <!-- 4.5 WATCHDOG CASE TAKEOVER & DISPUTE RESOLUTION CONSOLE (The Recovery Principle) -->
+    <!-- 4.5 WATCHDOG CASE TAKEOVER & DISPUTE RESOLUTION CONSOLE -->
     @if (details.deal.status === 'disputed') {
-      <section class="dispute-console-card dw-card" aria-label="Watchdog Case Takeover">
+      <section class="dispute-console-card dw-card" aria-label="Dispute Resolution">
         <div class="dispute-console-header">
           <div class="dch-left">
             <div class="dch-badge-row">
               <span class="dw-badge dw-badge-danger">
                 <span class="dw-badge-dot"></span>
-                <span>🛡️ Watchdog Case Takeover Active</span>
+                <span>Dispute Active</span>
               </span>
               <span class="cure-countdown-badge">
-                ⏳ 7-Day Cure Window: Active
+                ⏳ 7-Day Resolution Window
               </span>
             </div>
-            <h2 class="dispute-console-heading">Transaction Paused for Issue Resolution</h2>
+            <h2 class="dispute-console-heading">Deal Paused for Resolution</h2>
             <p class="dispute-console-sub">
-              An issue was reported on the evidence ledger. Trade funds and handover sign-offs are paused while both parties work to resolve the matter or submit clarifying evidence.
+              An issue was reported. Handover and sign-offs are paused while both parties work together to resolve it.
             </p>
           </div>
 
           <div class="dch-actions">
             <button type="button" class="dw-btn dw-btn-primary" (click)="resolveActiveDispute(details.deal.id)">
-              <span>✓ Resolve & Unfreeze Deal</span>
+              <span>✓ Mark Issue Resolved</span>
             </button>
             <button type="button" class="dw-btn dw-btn-secondary" (click)="downloadAuditDossier(details.deal.id)">
-              <span>📄 Download Sealed Dossier</span>
+              <span>📄 Download Deal Summary</span>
             </button>
           </div>
         </div>
@@ -186,22 +186,22 @@
           <div class="dp-step done">
             <span class="dp-idx">1</span>
             <div>
-              <strong>Breach Flagged</strong>
-              <span>Evidence logged on ledger</span>
+              <strong>Issue Reported</strong>
+              <span>Logged on timeline</span>
             </div>
           </div>
           <div class="dp-step current">
             <span class="dp-idx">2</span>
             <div>
-              <strong>7-Day Cure Period</strong>
-              <span>Replace, repair, or refund</span>
+              <strong>Resolution Window</strong>
+              <span>Work with partner to resolve</span>
             </div>
           </div>
           <div class="dp-step">
             <span class="dp-idx">3</span>
             <div>
-              <strong>Regulatory Escalation</strong>
-              <span>Dossier sent to Bank & Authority</span>
+              <strong>Escalation</strong>
+              <span>Review with Watchdog team</span>
             </div>
           </div>
         </div>
@@ -279,21 +279,21 @@
       }
     }
 
-    <!-- 5.5 PRE-PAYMENT LOCKED BASELINE PHOTOS (Core USP) -->
+    <!-- 5.5 ITEM PHOTOS -->
     @if (details.evidence && details.evidence.length > 0) {
-      <section class="locked-baseline-card dw-card" aria-label="Pre-Payment Proof Ledger">
+      <section class="locked-baseline-card dw-card" aria-label="Item Photos">
         <div class="baseline-header-row">
           <div class="baseline-title-group">
             <div class="baseline-tag-row">
               <span class="dw-badge dw-badge-active">
                 <span class="dw-badge-dot"></span>
-                <span>🔒 Sealed Baseline</span>
+                <span>Photos Saved</span>
               </span>
-              <span class="font-mono text-xs text-sky">{{ details.evidence.length }} Photo{{ details.evidence.length > 1 ? 's' : '' }} Locked</span>
+              <span class="font-mono text-xs text-sky">{{ details.evidence.length }} Photo{{ details.evidence.length > 1 ? 's' : '' }}</span>
             </div>
-            <h2 class="baseline-heading">Pre-Payment Item Photos & Condition Baseline</h2>
+            <h2 class="baseline-heading">Agreed Item Photos</h2>
             <p class="baseline-sub">
-              These photos were sealed to the tamper-proof evidence ledger before payment. Both parties must use these to verify condition at delivery handover.
+              These photos were saved before payment. Both parties can use these to verify condition at delivery.
             </p>
           </div>
         </div>
@@ -325,8 +325,8 @@
       <main class="timeline-column dw-card">
         <div class="dw-card-header">
           <div>
-            <h2 class="dw-card-title">Deal Timeline & Evidence Log</h2>
-            <p class="dw-card-subtitle">Every signature, payment receipt, delivery photo, and message is recorded in order.</p>
+            <h2 class="dw-card-title">Deal Timeline</h2>
+            <p class="dw-card-subtitle">All updates, photos, payment receipts, and messages appear here.</p>
           </div>
         </div>
 
@@ -513,7 +513,7 @@
           </div>
 
           <p class="side-note">
-            Always include reference <code class="font-mono">{{ details.deal.reference_no }}</code> in your direct transfer note and upload proof so both sides have mutual accountability on the timeline.
+            Add reference <code class="font-mono">{{ details.deal.reference_no }}</code> to your transfer note and upload your receipt so both parties can confirm payment on the timeline.
           </p>
         </div>
 
@@ -530,34 +530,34 @@
       <div class="modal-backdrop" (click)="showWaybillDrawer.set(false)" role="dialog" aria-modal="true">
         <div class="modal-dialog" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3 class="modal-title">Upload Delivery & Handover Proof</h3>
+            <h3 class="modal-title">Upload Delivery Proof</h3>
             <button type="button" class="modal-close" (click)="showWaybillDrawer.set(false)">✕</button>
           </div>
           <div class="modal-body">
             <div class="dw-form-group">
-              <label class="dw-label">Delivery Method / Courier *</label>
-              <input type="text" class="dw-input" placeholder="e.g. In-Person Handover, DHL, FedEx, Local Courier" [ngModel]="waybillCarrier()" (ngModelChange)="waybillCarrier.set($event)" />
+              <label class="dw-label">Delivery Method or Courier *</label>
+              <input type="text" class="dw-input" placeholder="e.g. In-Person Handover, DHL, FedEx, Local Rider" [ngModel]="waybillCarrier()" (ngModelChange)="waybillCarrier.set($event)" />
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Tracking Number / Reference (Optional)</label>
+              <label class="dw-label">Tracking Number or Reference (Optional)</label>
               <input type="text" class="dw-input font-mono" placeholder="e.g. TRK-948201" [ngModel]="waybillPlate()" (ngModelChange)="waybillPlate.set($event)" />
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Courier / Contact Phone (Optional)</label>
+              <label class="dw-label">Courier Phone Number (Optional)</label>
               <input type="text" class="dw-input" placeholder="e.g. +1 555 234 5678" [ngModel]="waybillDriver()" (ngModelChange)="waybillDriver.set($event)" />
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Handover Condition Notes</label>
-              <textarea class="dw-textarea" rows="3" placeholder="Describe item condition, serial number, or package contents..." [ngModel]="waybillChecklist()" (ngModelChange)="waybillChecklist.set($event)"></textarea>
+              <label class="dw-label">Delivery Notes</label>
+              <textarea class="dw-textarea" rows="3" placeholder="Describe package contents or handover details..." [ngModel]="waybillChecklist()" (ngModelChange)="waybillChecklist.set($event)"></textarea>
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Upload Photo / Receipt *</label>
+              <label class="dw-label">Upload Photo or Receipt *</label>
               <input type="file" accept="image/*,.pdf" (change)="onWaybillFileSelected($event)" class="dw-input" />
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="dw-btn dw-btn-secondary" (click)="showWaybillDrawer.set(false)">Cancel</button>
-            <button type="button" class="dw-btn dw-btn-primary" (click)="submitWaybillProof()">Submit Delivery Proof to Ledger &rarr;</button>
+            <button type="button" class="dw-btn dw-btn-primary" (click)="submitWaybillProof()">Submit Delivery Proof &rarr;</button>
           </div>
         </div>
       </div>
@@ -568,34 +568,34 @@
       <div class="modal-backdrop" (click)="showPaymentDrawer.set(false)" role="dialog" aria-modal="true">
         <div class="modal-dialog" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3 class="modal-title">Log Direct Payment Proof</h3>
+            <h3 class="modal-title">Record Payment</h3>
             <button type="button" class="modal-close" (click)="showPaymentDrawer.set(false)">✕</button>
           </div>
           <div class="modal-body">
-            <div class="dw-badge dw-badge-neutral mb-3">Direct P2P Transfer • Watchdog does not hold or process funds</div>
+            <div class="dw-badge dw-badge-neutral mb-3">Direct Payment • Watchdog does not hold or process funds</div>
             <div class="dw-tabs mb-4">
               <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'full'" (click)="setPaymentMode('full')">Full Amount</button>
-              <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'instalment'" (click)="setPaymentMode('instalment')">Partial / Milestone</button>
+              <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'instalment'" (click)="setPaymentMode('instalment')">Partial Payment</button>
             </div>
             <div class="dw-form-group">
               <label class="dw-label">Amount Paid ({{ details.deal.currency }}) *</label>
               <input type="number" class="dw-input font-mono" placeholder="0.00" [ngModel]="paymentAmount()" (ngModelChange)="paymentAmount.set($event)" />
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Transfer Reference / Receipt ID *</label>
+              <label class="dw-label">Bank Reference / Transaction ID *</label>
               <input type="text" class="dw-input font-mono" placeholder="e.g. TXN-9841204" [ngModel]="paymentBankRef()" (ngModelChange)="paymentBankRef.set($event)" />
-              <span class="dw-field-hint">Bank transaction reference or NIP session ID.</span>
+              <span class="dw-field-hint">Your bank's reference number or session ID.</span>
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Upload Payment Screenshot / Receipt *</label>
+              <label class="dw-label">Upload Receipt or Screenshot *</label>
               <input type="file" accept="image/*,.pdf" (change)="onPaymentReceiptSelected($event)" class="dw-input" />
-              <span class="dw-field-hint">Official bank transfer receipt or alert screenshot. Stored permanently on the audit ledger.</span>
+              <span class="dw-field-hint">Bank transfer receipt or payment confirmation screenshot.</span>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="dw-btn dw-btn-secondary" (click)="showPaymentDrawer.set(false)">Cancel</button>
             <button type="button" class="dw-btn dw-btn-primary" [disabled]="paymentSubmitting()" (click)="submitPaymentReport()">
-              {{ paymentSubmitting() ? 'Recording on Ledger...' : 'Log Payment Proof to Timeline →' }}
+              {{ paymentSubmitting() ? 'Saving...' : 'Save Payment Receipt →' }}
             </button>
           </div>
         </div>
@@ -607,31 +607,31 @@
       <div class="modal-backdrop" (click)="closeDiscrepancyModal()" role="dialog" aria-modal="true">
         <div class="modal-dialog" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3 class="modal-title">Report an Issue with This Deal</h3>
+            <h3 class="modal-title">Report an Issue</h3>
             <button type="button" class="modal-close" (click)="closeDiscrepancyModal()">✕</button>
           </div>
           <div class="modal-body">
             <p class="text-xs text-secondary mb-4">
-              If the item condition does not match what was agreed, or an agreed transfer or delivery is missing, report it here. Submitting flags the deal on the shared timeline and initiates the official Watchdog 7-Day mutual resolution window.
+              If the item condition does not match what was agreed, or an agreed transfer or delivery is missing, report it here.
             </p>
             <div class="dw-form-group">
               <label class="dw-label">What went wrong? *</label>
               <select class="dw-select" [ngModel]="discrepancyType()" (ngModelChange)="discrepancyType.set($event)">
-                <option value="partial_delivery">Item condition does not match baseline photos</option>
+                <option value="partial_delivery">Item condition does not match photos</option>
                 <option value="delayed">Delivery is delayed or missing</option>
-                <option value="funds_not_seen">Payment transfer not received</option>
+                <option value="funds_not_seen">Payment not received</option>
               </select>
             </div>
             <div class="dw-form-group">
-              <label class="dw-label">Details & Evidence Notes *</label>
-              <textarea class="dw-textarea" rows="4" placeholder="Explain the issue clearly..." [ngModel]="discrepancyNotes()" (ngModelChange)="discrepancyNotes.set($event)"></textarea>
-              <span class="dw-field-hint">Be factual and specific. Recorded on the permanent regulatory dossier.</span>
+              <label class="dw-label">Explain what happened *</label>
+              <textarea class="dw-textarea" rows="4" placeholder="Describe the issue clearly..." [ngModel]="discrepancyNotes()" (ngModelChange)="discrepancyNotes.set($event)"></textarea>
+              <span class="dw-field-hint">Be factual and clear so both parties can understand.</span>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="dw-btn dw-btn-secondary" (click)="closeDiscrepancyModal()">Cancel</button>
             <button type="button" class="dw-btn dw-btn-danger" [disabled]="discrepancySubmitting()" (click)="submitDiscrepancy()">
-              {{ discrepancySubmitting() ? 'Opening Case...' : 'Open Dispute & Flag on Timeline →' }}
+              {{ discrepancySubmitting() ? 'Reporting...' : 'Report Issue →' }}
             </button>
           </div>
         </div>

@@ -4,21 +4,9 @@
   <section class="hx-obsidian-hero dw-reveal-scale" aria-label="Account Protection Hero">
     <div class="hx-hero-ambient-glow" aria-hidden="true"></div>
 
-    <!-- Top Card Strip -->
-    <div class="hx-hero-top-strip">
-      <div class="hx-chip-pill">
-        <span class="hx-chip-dot"></span>
-        <span class="hx-chip-text">Watchdog Ledger &bull; Univasos Anchor</span>
-      </div>
-      <div class="hx-status-pill">
-        <span class="hx-pulse-dot"></span>
-        <span>0% Money Frozen &bull; Direct Settlement</span>
-      </div>
-    </div>
-
     <!-- Hero Volume Block -->
     <div class="hx-hero-volume-block">
-      <span class="hx-volume-label">TOTAL PROTECTED TRADE VOLUME</span>
+      <span class="hx-volume-label">Total Value of Deals</span>
       <div class="hx-volume-value font-mono">
         @if (loading()) {
           <span class="dw-skeleton" style="width: 240px; height: 46px; border-radius: 12px; display: inline-block;"></span>
@@ -27,9 +15,9 @@
         }
       </div>
       <div class="hx-volume-meta">
-        <span>Across {{ deals().length }} recorded agreements</span>
+        <span>{{ deals().length }} deals created</span>
         <span class="hx-bullet">&bull;</span>
-        <span class="text-sky">{{ activeDealsCount() }} Active in Pipeline</span>
+        <span class="text-sky">{{ activeDealsCount() }} active</span>
       </div>
     </div>
 
@@ -120,49 +108,49 @@
     </a>
   </section>
 
-  <!-- 5. Dual-Anchor Account Protection & Direct Ledger Gateway -->
+  <!-- 5. Account Verification -->
   <section class="dw-card dw-card-padded hx-protection-gateway-card" aria-label="Account Security Standing">
     <div class="hx-gateway-head">
       <div class="hx-gateway-title-group">
         <div class="hx-gateway-badge-icon">🛡️</div>
         <div>
-          <h2 class="dw-card-title">Dual-Anchor Account Protection</h2>
+          <h2 class="dw-card-title">Account Verification</h2>
           <p class="dw-card-subtitle">
-            Cryptographic identity baseline and locked settlement bank for fraud-free transactions.
+            Verify your face and legal name to build trust and protect your deals.
           </p>
         </div>
       </div>
       <a routerLink="/deals" class="dw-btn dw-btn-sm dw-btn-secondary hx-view-ledger-btn">
-        <span>View Full Deals Ledger</span>
+        <span>View All Deals</span>
         <span>&rarr;</span>
       </a>
     </div>
 
     <div class="hx-gateway-tiles-grid">
-      <!-- Anchor 1: Face Biometric -->
-      <a routerLink="/profile" class="hx-gateway-tile" title="View 3D Face Anchor in Profile">
+      <!-- Verification 1: Face -->
+      <a routerLink="/profile" class="hx-gateway-tile" title="View Face Verification in Profile">
         <div class="hx-gt-icon-box">📸</div>
         <div class="hx-gt-info">
-          <strong class="hx-gt-title">3D Face Biometric Anchor</strong>
+          <strong class="hx-gt-title">Face Verification</strong>
           <span class="hx-gt-status" [class.is-verified]="verificationService.isBiometricVerified()">
-            {{ verificationService.isBiometricVerified() ? '✓ Anchored & Sealed (Locked)' : 'Face Verification Needed' }}
+            {{ verificationService.isBiometricVerified() ? '✓ Verified' : 'Face Verification Needed' }}
           </span>
-          <span class="hx-gt-sub">All subsequent verifications match this baseline.</span>
+          <span class="hx-gt-sub">A quick selfie confirms you are a real person.</span>
         </div>
         <span class="hx-gt-arrow">&rarr;</span>
       </a>
 
-      <!-- Anchor 2: Settlement Bank -->
-      <a routerLink="/profile" class="hx-gateway-tile" title="View Payout Settlement Bank in Profile">
+      <!-- Verification 2: Bank Identity -->
+      <a routerLink="/profile" class="hx-gateway-tile" title="View Legal Name Verification in Profile">
         <div class="hx-gt-icon-box">🏦</div>
         <div class="hx-gt-info">
-          <strong class="hx-gt-title">Payout Settlement Bank</strong>
+          <strong class="hx-gt-title">Legal Name (Bank Check)</strong>
           <span class="hx-gt-status" [class.is-verified]="verificationService.isBankVerified()">
             {{ verificationService.isBankVerified()
-              ? '✓ ' + (authService.activeBusiness()?.bank_name || 'Bank Linked') + ' (Locked)'
-              : 'Payout Bank Setup Needed' }}
+              ? '✓ ' + (authService.activeBusiness()?.bank_name || 'Bank Verified')
+              : 'Name Verification Needed' }}
           </span>
-          <span class="hx-gt-sub">Settlement funds flow exclusively to your anchored account.</span>
+          <span class="hx-gt-sub">Checks that your legal name matches your account.</span>
         </div>
         <span class="hx-gt-arrow">&rarr;</span>
       </a>

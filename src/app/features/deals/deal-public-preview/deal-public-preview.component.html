@@ -101,17 +101,17 @@
           </div>
         </div>
 
-        <!-- Core USP: Pre-Payment Proof Photos (Locked Baseline) -->
+        <!-- Core USP: Item Photos -->
         @if (data.evidence && data.evidence.length > 0) {
           <section class="prepayment-photos-section">
             <div class="section-title-row">
               <div>
-                <h2 class="sub-heading">📸 Pre-Payment Locked Photos</h2>
+                <h2 class="sub-heading">📸 Item Photos</h2>
                 <p class="sub-sub">
-                  The seller sealed these {{ data.evidence.length }} photo{{ data.evidence.length > 1 ? 's' : '' }} to the evidence ledger. Inspect these closely before agreeing.
+                  The seller uploaded these {{ data.evidence.length }} photo{{ data.evidence.length > 1 ? 's' : '' }} before payment. Check these closely before agreeing.
                 </p>
               </div>
-              <span class="ledger-pill">🔒 Ledger Sealed</span>
+              <span class="ledger-pill">Photos Saved</span>
             </div>
 
             <div class="evidence-grid">
@@ -128,9 +128,9 @@
           </section>
         }
 
-        <!-- Terms & Covenants -->
+        <!-- Terms & Agreement -->
         <section class="terms-section">
-          <h2 class="sub-heading">Agreed Handover & Condition Covenants</h2>
+          <h2 class="sub-heading">Agreed Terms</h2>
           <div class="terms-block font-mono">
             {{ data.current_version?.terms_text || 'Standard Digital Watchdog protected transaction terms apply.' }}
           </div>
@@ -140,18 +140,18 @@
         <div class="protection-callout-grid">
           <div class="callout-item">
             <span class="callout-icon">🔐</span>
-            <strong>1. Locked Baseline</strong>
-            <p>Seller's photos and promises cannot be secretly altered or deleted after you sign.</p>
+            <strong>1. Locked Details</strong>
+            <p>Photos and terms cannot be changed after you sign.</p>
           </div>
           <div class="callout-item">
             <span class="callout-icon">📦</span>
             <strong>2. Physical Check</strong>
-            <p>Inspect the item at handover against these exact photos before making direct payment.</p>
+            <p>Inspect the item at delivery against these exact photos before making payment.</p>
           </div>
           <div class="callout-item">
             <span class="callout-icon">⚖️</span>
-            <strong>3. Active Case Takeover</strong>
-            <p>If the item is broken, missing, or swapped, Watchdog steps in with the evidence dossier.</p>
+            <strong>3. Dispute Support</strong>
+            <p>If the item is broken, missing, or swapped, Watchdog provides a clear record of the agreement.</p>
           </div>
         </div>
 
@@ -162,11 +162,11 @@
             class="dw-btn dw-btn-primary dw-btn-lg btn-full-mobile"
             (click)="onAcceptAndClaim()"
           >
-            <span>Review & Digitally Accept Agreement &rarr;</span>
+            <span>Review & Accept Agreement &rarr;</span>
           </button>
 
           <p class="conversion-legal-note">
-            🔒 By proceeding, both parties are bound by the locked item condition baseline and the Digital Watchdog 7-Day Cure and Handover Guarantee. View <a routerLink="/terms" target="_blank">Terms of Protection</a>.
+            By proceeding, both parties agree to these terms and the item photos. View <a routerLink="/terms" target="_blank">Terms</a>.
           </p>
 
           <button
@@ -199,7 +199,7 @@
         <button type="button" class="lightbox-close-btn" (click)="closeLightbox()">&times;</button>
         <img [src]="photoUrl" alt="Pre-Payment Evidence Zoom" class="lightbox-img" />
         <div class="lightbox-caption">
-          🔒 Cryptographically Sealed Pre-Payment Baseline Photo
+          Agreed Item Photo
         </div>
       </div>
     </div>
