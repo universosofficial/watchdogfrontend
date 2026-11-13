@@ -147,11 +147,11 @@ export class DealCreateComponent implements OnInit {
   setTranche(val: 'single' | 'two_stage' | 'three_stage'): void {
     this.selectedTranche.set(val);
     const schedule = val === 'single'
-      ? '100% full settlement upon final verified delivery inspection.'
+      ? '100% direct payment between parties upon final verified delivery inspection.'
       : val === 'two_stage'
-        ? '50% initial advance transfer; 50% upon verified delivery sign-off.'
-        : '30% deposit; 40% intermediate verified milestone; 30% final sign-off.';
-    this.appendOrReplaceCovenant('SETTLEMENT TRANCHES', schedule);
+        ? '50% initial advance direct transfer; 50% upon verified delivery sign-off.'
+        : '30% direct advance; 40% intermediate verified milestone; 30% final sign-off.';
+    this.appendOrReplaceCovenant('DIRECT PAYMENT SCHEDULE', schedule);
   }
 
   private appendOrReplaceCovenant(title: string, content: string): void {

@@ -585,7 +585,7 @@ export class DealWorkspaceComponent implements OnInit, OnDestroy {
         currency: 'NGN',
         reference_no: bankRef,
         paid_at: new Date().toISOString(),
-        payer_notes: this.paymentPayerNotes().trim() || (this.paymentMode() === 'instalment' ? 'Milestone instalment payment' : 'Full settlement transfer')
+        payer_notes: this.paymentPayerNotes().trim() || (this.paymentMode() === 'instalment' ? 'Milestone direct transfer' : 'Direct payment transfer')
       };
 
       if (evidenceId) {
@@ -597,8 +597,8 @@ export class DealWorkspaceComponent implements OnInit, OnDestroy {
           this.paymentSubmitting.set(false);
           this.notificationService.showSuccess(
             this.paymentMode() === 'instalment'
-              ? `Instalment transfer of ₦${amount.toLocaleString()} logged on ledger with proof!`
-              : `Payment of ₦${amount.toLocaleString()} logged on ledger with proof!`
+              ? `Milestone direct transfer of ₦${amount.toLocaleString()} logged on timeline with proof!`
+              : `Direct payment proof of ₦${amount.toLocaleString()} logged on timeline with proof!`
           );
           this.showPaymentDrawer.set(false);
           this.clearPaymentReceipt();

@@ -5,7 +5,7 @@
     <div>
       <h1 class="dw-page-title">Identity & Bank Verification</h1>
       <p class="dw-page-subtitle">
-        Verify your identity and link your payout bank account to build instant trust and unlock higher deal limits.
+        Verify your identity and confirm your real legal name via your bank to build instant trust and unlock higher deal limits.
       </p>
     </div>
   </header>
@@ -41,8 +41,8 @@
         {{ isBankVerified() ? '✓' : '2' }}
       </span>
       <div class="step-tab-texts">
-        <strong>Payout Bank Account</strong>
-        <span>{{ isBankVerified() ? 'Account Linked' : 'Verify settlement bank' }}</span>
+        <strong>Bank Identity Check</strong>
+        <span>{{ isBankVerified() ? 'Identity Verified' : 'Verify real legal name' }}</span>
       </div>
     </button>
   </nav>
@@ -77,7 +77,7 @@
 
           <div class="state-actions-row">
             <button type="button" class="dw-btn dw-btn-primary" (click)="setStep(2)">
-              <span>Continue to Step 2: Payout Bank &rarr;</span>
+              <span>Continue to Step 2: Bank Identity Check &rarr;</span>
             </button>
             <button type="button" class="dw-btn dw-btn-ghost" (click)="onInitiateRescan()">
               Re-scan Face
@@ -258,10 +258,10 @@
         <div class="bank-form-wrap">
           <div class="bank-form-head">
             <h2 class="state-title">
-              {{ isEditingBank() ? 'Update Payout Bank Account' : 'Link Payout Bank Account' }}
+              {{ isEditingBank() ? 'Update Bank Identity Verification' : 'Verify Legal Name via Bank' }}
             </h2>
             <p class="state-desc">
-              Select your bank and enter your account number so buyer payments go straight to your verified account.
+              Select your bank and enter your account number so we can verify your registered legal name and confirm your verified identity.
             </p>
           </div>
 
@@ -342,7 +342,7 @@
               [disabled]="bankVerifying()"
             />
             <div class="hint-between-row">
-              <span class="dw-field-hint">We automatically verify your account name with your bank.</span>
+              <span class="dw-field-hint">We verify that the account holder name matches your registered identity.</span>
               @if (!isProduction) {
                 <button type="button" class="dw-btn dw-btn-sm dw-btn-ghost" (click)="fillTestAccount()">
                   Fill Test Account (Dev)
@@ -382,7 +382,7 @@
                 <span class="spinner"></span>
                 <span>Saving Account...</span>
               } @else {
-                <span>Save & Link Bank Account &rarr;</span>
+                <span>Confirm & Verify Legal Identity &rarr;</span>
               }
             </button>
 

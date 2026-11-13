@@ -295,10 +295,10 @@
             </div>
 
             <div class="adv-row">
-              <span class="adv-label">Payment Structure:</span>
+              <span class="adv-label">Direct Payment Schedule:</span>
               <div class="adv-pills">
-                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedTranche() === 'single' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setTranche('single')">100% Full Payment</button>
-                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedTranche() === 'two_stage' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setTranche('two_stage')">50% / 50% Split</button>
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedTranche() === 'single' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setTranche('single')">100% Direct on Inspection</button>
+                <button type="button" class="dw-btn dw-btn-sm" [ngClass]="selectedTranche() === 'two_stage' ? 'dw-btn-primary' : 'dw-btn-secondary'" (click)="setTranche('two_stage')">50% Advance / 50% Final</button>
               </div>
             </div>
 

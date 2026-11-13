@@ -497,8 +497,8 @@
         <!-- Card 3: Payment Reference & Protection -->
         <div class="dw-card dw-card-padded side-summary-card">
           <div class="side-row-between">
-            <span class="side-eyebrow">SETTLEMENT DETAILS</span>
-            <span class="dw-badge dw-badge-success">Direct Transfer</span>
+            <span class="side-eyebrow">DIRECT PAYMENT INFO</span>
+            <span class="dw-badge dw-badge-success">Direct P2P Transfer</span>
           </div>
 
           <div class="reconcile-rows">
@@ -513,7 +513,7 @@
           </div>
 
           <p class="side-note">
-            Always include reference <code class="font-mono">{{ details.deal.reference_no }}</code> in your transfer note and upload the payment receipt so both sides have permanent proof.
+            Always include reference <code class="font-mono">{{ details.deal.reference_no }}</code> in your direct transfer note and upload proof so both sides have mutual accountability on the timeline.
           </p>
         </div>
 
@@ -568,10 +568,11 @@
       <div class="modal-backdrop" (click)="showPaymentDrawer.set(false)" role="dialog" aria-modal="true">
         <div class="modal-dialog" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3 class="modal-title">Record Payment Transfer</h3>
+            <h3 class="modal-title">Log Direct Payment Proof</h3>
             <button type="button" class="modal-close" (click)="showPaymentDrawer.set(false)">✕</button>
           </div>
           <div class="modal-body">
+            <div class="dw-badge dw-badge-neutral mb-3">Direct P2P Transfer • Watchdog does not hold or process funds</div>
             <div class="dw-tabs mb-4">
               <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'full'" (click)="setPaymentMode('full')">Full Amount</button>
               <button type="button" class="dw-tab-btn" [class.active]="paymentMode() === 'instalment'" (click)="setPaymentMode('instalment')">Partial / Milestone</button>
@@ -594,7 +595,7 @@
           <div class="modal-footer">
             <button type="button" class="dw-btn dw-btn-secondary" (click)="showPaymentDrawer.set(false)">Cancel</button>
             <button type="button" class="dw-btn dw-btn-primary" [disabled]="paymentSubmitting()" (click)="submitPaymentReport()">
-              {{ paymentSubmitting() ? 'Recording on Ledger...' : 'Confirm & Record Bank Payment →' }}
+              {{ paymentSubmitting() ? 'Recording on Ledger...' : 'Log Payment Proof to Timeline →' }}
             </button>
           </div>
         </div>
@@ -611,7 +612,7 @@
           </div>
           <div class="modal-body">
             <p class="text-xs text-secondary mb-4">
-              If the item condition does not match what was agreed, or a payment/delivery is missing, report it here. Submitting pauses trade funds and initiates the official Watchdog 7-Day Cure and Handover resolution window.
+              If the item condition does not match what was agreed, or an agreed transfer or delivery is missing, report it here. Submitting flags the deal on the shared timeline and initiates the official Watchdog 7-Day mutual resolution window.
             </p>
             <div class="dw-form-group">
               <label class="dw-label">What went wrong? *</label>
@@ -630,7 +631,7 @@
           <div class="modal-footer">
             <button type="button" class="dw-btn dw-btn-secondary" (click)="closeDiscrepancyModal()">Cancel</button>
             <button type="button" class="dw-btn dw-btn-danger" [disabled]="discrepancySubmitting()" (click)="submitDiscrepancy()">
-              {{ discrepancySubmitting() ? 'Opening Case...' : 'Open Case & Freeze Transaction →' }}
+              {{ discrepancySubmitting() ? 'Opening Case...' : 'Open Dispute & Flag on Timeline →' }}
             </button>
           </div>
         </div>

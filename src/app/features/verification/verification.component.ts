@@ -438,7 +438,7 @@ export class VerificationComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.bankVerifying.set(false);
         this.isEditingBank.set(false);
-        this.notificationService.showSuccess(res.message || 'Settlement bank account permanently anchored!');
+        this.notificationService.showSuccess(res.message || 'Legal identity confirmed via bank verification!');
         this.loadTrustRadar();
       },
       error: (err) => {

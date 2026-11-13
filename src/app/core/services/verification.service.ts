@@ -209,7 +209,7 @@ export class VerificationService {
       title: context.title || 'Transaction Clearance Required',
       message:
         context.message ||
-        `This deal amount exceeds your current clearance tier. Anchor your settlement bank account or complete 3D facial verification to unlock higher deal volumes.`,
+        `This deal amount exceeds your current clearance tier. Complete bank identity verification or 3D facial verification to unlock higher deal volumes.`,
       currentTier: curTier,
       requiredTier: reqTier,
       dealAmount: context.dealAmount
